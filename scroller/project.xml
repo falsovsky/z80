@@ -28,14 +28,14 @@
     <Settings>
       <ScorePanel>
         <Alignment>1</Alignment>
-        <Layout>0</Layout>
+        <Layout>1</Layout>
         <Show>false</Show>
         <AllowOverlap>false</AllowOverlap>
         <XOverlap>0</XOverlap>
         <YOverlap>0</YOverlap>
       </ScorePanel>
       <ScreenLayout>
-        <DontIntersectTiles>false</DontIntersectTiles>
+        <DontIntersectTiles>true</DontIntersectTiles>
         <SnapToGrid>true</SnapToGrid>
         <GridWidth>8</GridWidth>
         <GridHeight>8</GridHeight>
@@ -82,6 +82,9 @@
     </Settings>
     <Files>
       <File>game.asm</File>
+      <File>scroll_pixel.asm</File>
+      <File>delay.asm</File>
+      <File>scroll_pc.asm</File>
     </Files>
   </CodeEditor>
 </TommyGunProject>
