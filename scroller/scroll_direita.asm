@@ -1,8 +1,7 @@
-;videoAddr2 equ 4820h       ; Linha 9
-;videoAddr2 equ 4920h       ; Faz o mesmo, tenho de entender porque
-;videoAddr2 equ             ; Linha 11
+;videoAddr2  equ 4820h       ; Linha 9
+;videoAddr2  equ 4920h       ; Faz o mesmo, tenho de entender porque
 
-addractual2 db  0,0
+addractual2  db 0,0
 primeiroaddr db 0,0
 
 ; Rotina de scroll de texto da esquerda para a direita pixel a pixel

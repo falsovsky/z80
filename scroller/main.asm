@@ -1,6 +1,11 @@
 org 30000
 
-tv_flag equ 5C3Ch
+tv_flag equ 5c3ch           ; Endereço que contem flags da tv
+last_k  equ 5c08h           ; Contem a ultima tecla pressionada
+; Video RAM
+LINHA9  equ 4820h
+LINHA10 equ 4840h
+LINHA11 equ 4860h
 
 ; 16 é para definir o INK
 ; 17 é para definir o PAPER
@@ -40,22 +45,22 @@ printa_ate_255
     jr printa_ate_255       ; Volta ao inicio da rotina
 
 mainloop
-    ld a, 0                 ; O endereço $5C08 tem o valor ASCII da ultima tecla
-    ld (5C08h), a           ; pressionada, vamos limpar isso
+    ld a, 0
+    ld (last_k), a          ; Limpa o valor da ultima tecla pressionada
 
-    ld hl, 4820h            ; Linha 9
+    ld hl, LINHA9
     call scroll_direita
-    ld hl, 4840h            ; Linha 10
+    ld hl, LINHA10
     call scroll_esquerda
-    ld hl, 4860h            ; Linha 11
+    ld hl, LINHA11
     call scroll_direita
     
     ld a, 1
     call delay              ; Chama a rotina de delay(1)
 
-    ld a, (5C08h)           ; Se o valor em $5C08 ainda for 0, é porque ainda  
-    cp 0                    ; não se pressionou nenhuma tecla, por isso...
-    jr Z, mainloop          ; repete
+    ld a, (last_k)          ; Se o valor da ultima tecla pressionada ainda
+    cp 0                    ; for 0, é porque ainda não se pressionou nenhuma
+    jr Z, mainloop          ; tecla, por isso... repete
 
 exit
     pop bc                  ; Tira o BC da Stack

@@ -1,8 +1,8 @@
 ;videoAddr   equ 4840h      ; Endereço de Memoria Video da Linha 10
 ;videoAddr   equ 4940h      ; Faz o mesmo, tenho de entender porque
 
-addractual1 db  0,0
-ultimoaddr  db  0,0
+addractual1  db 0,0
+ultimoaddr   db 0,0
 
 ; Rotina de scroll de texto da direita para a esquerda pixel a pixel
 ; O endereço inicial tem de vir em HL
