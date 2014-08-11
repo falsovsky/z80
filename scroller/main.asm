@@ -6,7 +6,7 @@ tv_flag    equ 5C3Ch
 ; 17 é para definir o PAPER
 ; 22 é para definir as Cordenadas Y,X
 ; 255 Marcador de fim da string
-mystr db 22,10,0, 16, 7, 17, 2, " ", 16,0, 17,1, ".o0O0o.   ", 17, 5, 16, 2, "LOL GORDOS", 17, 1, 16,6, "   .o0O0o.", 16, 7, 17, 2, " ", 255
+mystr db 22,10,0, 16, 7, " ", 16, 6, ".o0O0o.   LOL GORDOS   .o0O0o.", 16, 7, " ", 255
 
 start
     xor a                   ; O mesmo que LD a, 0
@@ -14,6 +14,8 @@ start
     
     push bc                 ; Parece que é algum standard guardar o BC 
 							; na stack, e tirar no fim do programa.
+
+	call clear_screen		; Limpa o ecrã
 
     ld hl, mystr            ; Le para HL o endereço da string a printar
     
@@ -29,7 +31,7 @@ printa_ate_255
     
     inc hl                  ; Incrementa o valor de HL
                             ; Passa a ter o endereço do proximo caracater da str
-                           
+
     jr printa_ate_255       ; Volta ao inicio da rotina
 
 mainloop
@@ -53,5 +55,6 @@ exit
 ;INCLUDE "scroll_pc.asm"
 INCLUDE "scroll_pixel.asm"
 INCLUDE "delay.asm"
+INCLUDE "clear.asm"
 
 end start

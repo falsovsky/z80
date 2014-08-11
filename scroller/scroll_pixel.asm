@@ -30,18 +30,16 @@ scrolla_0
 scrolla_1
     ld hl, (tmpScroll1)    ; Le o argumento tmp1 para HL
     
-    ; Soma $1F ao endereço para começar no fim da linha, tudo à direita
+    ; Soma $20 ao endereço para começar no fim da linha, tudo à direita
     push bc
-    ;ld bc, 1Fh
-    ld bc, 20h
+	ld bc, 20h
     adc hl, bc
 
     ; Guarda o endereço do fim da linha em (ultimoaddr)
     ld (ultimoaddr), hl
     pop bc
 
-    ;ld b, 1Fh             ; Numero de vezes que a rotina vai correr
-    ld b, 21h              ; Numero de vezes que a rotina vai correr
+	ld b, 21h
 
 ; Loop2
 scrolla_2
