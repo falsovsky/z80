@@ -7,7 +7,7 @@ font_start  equ 3d00h   ; Endereço onde começa a fonte, acaba em $3fff
                         ; Começa com o espaço e acaba no ©
                         ; http://en.wikipedia.org/wiki/ZX_Spectrum_character_set
 
-udg         equ 5C7Bh   ; Endereço do primeiro user-defined graphics (2 bytes)
+udg         equ 5c7bh   ; Endereço do primeiro user-defined graphics (2 bytes)
                         ; Contem $ff58 inicialmente
 
 udg_start   equ ff58h   ; User-defined characters, vai até $ffff
