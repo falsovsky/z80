@@ -58,7 +58,6 @@ exit
 
 INCLUDE "scroll_pixel.asm"  ; Scroller pixel a pixel
 ;INCLUDE "scroll_pc.asm"    ; Scroller 8 pixels de cada vez
-                            ; ripado do Paradise Café
 INCLUDE "delay.asm"         ; Rotina de delay
 INCLUDE "clear.asm"         ; Rotina para limpar o ecrã
 INCLUDE "printnumbers.asm"  ; Rotina para printar numeros
