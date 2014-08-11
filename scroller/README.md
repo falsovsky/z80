@@ -1,17 +1,17 @@
 Scroller
 =========
 
-Scroller È uma implementaÁ„o um scroller de texto em Assembly no ZX Spectrum.
+Scroller √© uma implementa√ß√£o um scroller de texto em Assembly no ZX Spectrum.
 
 Requisitos
 -----------
 
-O unico realmente necess·rio È o Assembler, mas para ver o resultado convem tambem ter um emulador, os verdadeiros podem converter o ficheiro [tap] para audio, passar para um leitor de mp3 e ligar a um Spectrum real :-D
+O unico realmente necess√°rio √© o Assembler, mas para ver o resultado convem tambem ter um emulador, os verdadeiros podem converter o ficheiro [tap] para audio, passar para um leitor de mp3 e ligar a um Spectrum real :-D
 
-* [Pasmo] - Assembler de Z80, È Open Source e Cross Platform
+* [Pasmo] - Assembler de Z80, √© Open Source e Cross Platform
 * [ZX Spin] - Emulador de ZX Spectrum para Windows que inclui um Debugger
 
-InstalaÁ„o
+Instala√ß√£o
 --------------
 
 ```sh
@@ -21,7 +21,7 @@ pasmo -v --tapbas --err main.asm main.tap
 
 ```
 
-LicenÁa
+Licen√ßa
 ----
 
 BSD

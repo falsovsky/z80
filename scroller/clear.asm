@@ -16,7 +16,7 @@
 ; P Paper
 ; I Ink
 
-; Ent„o para definir o flash desligado, o brightness ligado com o
+; Ent√£o para definir o flash desligado, o brightness ligado com o
 ; fundo a preto e o texto a amarelo fica-se com:
 ; 01000110 = 70
 ; 01000000 = 64 - Tudo preto
@@ -29,11 +29,11 @@ clear_screen
 	ld a, (screen_attribute)
 	ld (23693), a		; Variavel de sistema que permite definir
 						; o ink, paper, brightness e flash
-	call 3503			; Chama a funÁ„o da ROM para fazer clear
+	call 3503			; Chama a fun√ß√£o da ROM para fazer clear
 						; screen
 
 	ld a, (border_attribute)
-	call 8859			; Chama a funÁ„o da ROM para actualizar 
-						; a border com o valor que est· em A
+	call 8859			; Chama a fun√ß√£o da ROM para actualizar 
+						; a border com o valor que est√° em A
 						; O valor fica guardado em 23624
 	ret
