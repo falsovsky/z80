@@ -30,29 +30,47 @@ scrolla_0
 scrolla_1
     ld hl, (tmpScroll1)     ; Le o argumento tmp1 para HL
 
-    ; Soma $1F ao endereço para começar no fim da linha, tudo à direita
     push bc
-    ld bc, 1Fh
-    adc hl, bc
+    ld bc, 1Fh              ; Soma $1F ao endereço para começar
+    adc hl, bc              ; no fim da linha, tudo à direita
+                            ; Cada linha tem 32 bytes 
 
-    ; Guarda o endereço do fim da linha em (ultimoaddr)
-    ld (ultimoaddr), hl
+    ld (ultimoaddr), hl     ; Guarda o endereço do fim da linha
     pop bc
 
-    ld b, 20h
+    ld b, 20h               ; Numero de vezes que vai correr
+
+; Vai começar por fazer um rotate left à coluna mais à direita, e
+; guarda o bit que se perde na carry, que vai ser usado como o
+; bit 0 do proximo rotate left que for executado.
+
+; Se no rotate da coluna mais à esquerda se perdeu alguma coisa, 
+; então é para passar para a coluna mais a direita.
+; Se depois do ultimo rotate o carry estiver definido, faz-se um
+; OR ao bit 0 da coluna mais à direita.
 
 ; Loop2
 scrolla_2
-    ld a, (hl)
-    rla
-    ld (hl), a
-    dec hl
-    djnz scrolla_2
+    ld a, (hl)              ; Faz um rotate left aos 8 pixels no
+    rla                     ; endereço de video ram em HL, o bit
+                            ; perdido fica na carry
+    ld (hl), a              ; Actualiza
+    dec hl                  ; Anda uma coluna para a esquerda
+    djnz scrolla_2          ; Se ainda nao chegou ao fim, repete
 
-    ld hl, (ultimoaddr)
-    ld a, (hl)
-    jr nc, sem_carry
-    or 1
+    ld hl, (ultimoaddr)     ; Le o valor do endereço da coluna 
+    ld a, (hl)              ; mais à direita, em A
+
+    ; Se não tem carry significa que não perdeu pixel nenhum
+    ; no ultimo rotate, então não é preciso passar nada para
+    ; a coluna mais à direita porque já tem o bit 0 a 0 devido
+    ; ao rotate inicial.
+    jr nc, sem_carry        ; Não tem carry? vai para o fim
+
+    ; Se tem carry é porque se perdeu um pixel no ultimo
+    ; rotate, então tem de se settar o bit 0 do coluna mais
+    ; à direita a 1
+    or 1                    ; bit 0 = 1
 sem_carry
-    ld (hl), a
+    ld (hl), a              ; Actualiza
     ret
