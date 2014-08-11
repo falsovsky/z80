@@ -3,15 +3,15 @@ ultimoaddr db  0,0
 videoAddr  equ 4840h        ; Endereço de Memoria Video da Linha 10
 
 ; Rotina de scroll de texto da direita para a esquerda pixel a pixel
-scrolla
+scroll
     ld hl, videoAddr        ; Endereço de Memoria Video a ser manipulado
     ld c, 8                 ; Numero de vezes que a rotina vai correr
                             ; 8 é o numero de linhas de pixeis a scrollar
 
 ; Loop1
-scrolla_0
+scroll_0
     ld (tmpScroll1), hl     ; Guarda o valor de HL em tmp1
-    call scrolla_1          ; Scrolla
+    call scroll_1           ; Scrolla
     ld hl, (tmpScroll1)     ; Le o valor de tmp1 para HL
 
     inc h                   ; Incrementa H, mas como estamos a trabalhar com um
@@ -23,11 +23,11 @@ scrolla_0
                             ; ..., videoAddr+$700
 
     dec c                   ; Decrementa o contador C 
-    jr nz, scrolla_0        ; Se C != 0 corre novamente o Loop1
+    jr nz, scroll_0         ; Se C != 0 corre novamente o Loop1
     ret
 
 ; Segunda rotina 
-scrolla_1
+scroll_1
     ld hl, (tmpScroll1)     ; Le o argumento tmp1 para HL
 
     push bc
@@ -50,13 +50,13 @@ scrolla_1
 ; OR ao bit 0 da coluna mais à direita.
 
 ; Loop2
-scrolla_2
+scroll_2
     ld a, (hl)              ; Faz um rotate left aos 8 pixels no
     rla                     ; endereço de video ram em HL, o bit
                             ; perdido fica na carry
     ld (hl), a              ; Actualiza
     dec hl                  ; Anda uma coluna para a esquerda
-    djnz scrolla_2          ; Se ainda nao chegou ao fim, repete
+    djnz scroll_2           ; Se ainda nao chegou ao fim, repete
 
     ld hl, (ultimoaddr)     ; Le o valor do endereço da coluna 
     ld a, (hl)              ; mais à direita, em A
@@ -65,12 +65,12 @@ scrolla_2
     ; no ultimo rotate, então não é preciso passar nada para
     ; a coluna mais à direita porque já tem o bit 0 a 0 devido
     ; ao rotate inicial.
-    jr nc, sem_carry        ; Não tem carry? vai para o fim
+    jr nc, scroll_sem_carry ; Não tem carry? vai para o fim
 
     ; Se tem carry é porque se perdeu um pixel no ultimo
     ; rotate, então tem de se settar o bit 0 do coluna mais
     ; à direita a 1
     or 1                    ; bit 0 = 1
-sem_carry
+scroll_sem_carry
     ld (hl), a              ; Actualiza
     ret

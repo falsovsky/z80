@@ -43,8 +43,7 @@ mainloop
     ld a, 0                 ; O endereço $5C08 tem o valor ASCII da ultima tecla
     ld (5C08h), a           ; pressionada, vamos limpar isso
     
-;   call scrollaPC          ; Scrolla com a rotina do Paradise Café
-    call scrolla            ; Scrolla pixel a pixel
+    call scroll             ; Scrolla
     
     ld a, 1
     call delay              ; Chama a rotina de delay(1)
@@ -57,10 +56,11 @@ exit
     pop bc                  ; Tira o BC da Stack
     ret                     ; Sai para o BASIC
 
-;INCLUDE "scroll_pc.asm"
-INCLUDE "scroll_pixel.asm"
-INCLUDE "delay.asm"
-INCLUDE "clear.asm"
-INCLUDE "printnumbers.asm"
+INCLUDE "scroll_pixel.asm"  ; Scroller pixel a pixel
+;INCLUDE "scroll_pc.asm"    ; Scroller 8 pixels de cada vez
+                            ; ripado do Paradise Café
+INCLUDE "delay.asm"         ; Rotina de delay
+INCLUDE "clear.asm"         ; Rotina para limpar o ecrã
+INCLUDE "printnumbers.asm"  ; Rotina para printar numeros
 
 end start
