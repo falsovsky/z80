@@ -1,3 +1,7 @@
+tmpScroll1 db  0,0
+tmpScroll2 db  0
+videoAddr  equ 4840h        ; Endereço de Memoria Video da Linha 10
+
 ; Rotina de scroll de texto da direita para a esquerda
 ; Ripada do Paradise Café
 scrollaPC

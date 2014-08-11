@@ -1,3 +1,7 @@
+tmpScroll1 db  0,0
+ultimoaddr db  0,0
+videoAddr  equ 4840h        ; Endereço de Memoria Video da Linha 10
+
 ; Rotina de scroll de texto da direita para a esquerda pixel a pixel
 scrolla
     ld hl, videoAddr       ; Endereço de Memoria Video a ser manipulado
@@ -33,14 +37,11 @@ scrolla_1
     adc hl, bc
 
     ; Guarda o endereço do fim da linha em (ultimoaddr)
-    ld b, h
-    ld c, l
-    ld (ultimoaddr), bc
+    ld (ultimoaddr), hl
     pop bc
 
-    ld b, 1Fh              ; Numero de vezes que a rotina vai correr
+    ;ld b, 1Fh             ; Numero de vezes que a rotina vai correr
     ld b, 21h              ; Numero de vezes que a rotina vai correr
-    
 
 ; Loop2
 scrolla_2
