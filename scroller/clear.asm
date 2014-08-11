@@ -38,7 +38,7 @@ clear_screen
     call rom_limpa_ecra ; Clear screen
 
     ld a, border_color  ; Cor do border
-    call rom_define_borda+7
+    call rom_define_borda+7h
     ; Chama a rotina da ROM para actualizar a borda, mas salta 7
     ; bytes à frente, porque são para ler o valor da borda do 
     ; BASIC. O valor fica guardado em 23624.

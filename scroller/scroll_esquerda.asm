@@ -8,7 +8,7 @@ ultimoaddr   db 0,0
 ; O endereço inicial tem de vir em HL
 scroll_esquerda
 ;    ld hl, videoAddr        ; Endereço de Memoria Video a ser manipulado
-    ld c, 8                 ; Numero de vezes que a rotina vai correr
+    ld c, 8h                ; Numero de vezes que a rotina vai correr
                             ; 8 é o numero de linhas de pixeis a scrollar
 
 ; Loop1
@@ -34,7 +34,7 @@ scroll_esquerda_1
     ld hl, (addractual1)    ; Le o argumento tmp1 para HL
 
     push bc
-    ld bc, 1Fh              ; Soma $1F ao endereço para começar
+    ld bc, 1fh              ; Soma $1f ao endereço para começar
     adc hl, bc              ; no fim da linha, tudo à direita
                             ; Cada linha tem 32 bytes 
 

@@ -26,7 +26,7 @@ start
 
     ; Flood de numeros em todas as linhas
     ld a, 0                 ; Começa na linha 0
-    ld b, 22                ; Repete nas 22 linhas
+    ld b, 16h               ; Repete nas 22 linhas
 lol_flood
     ld c, a                 ; Guarda o A em C e o B em D porque
     ld d, b                 ; são alterados no call
@@ -39,7 +39,7 @@ lol_flood
     ld hl, mystr            ; Le para HL o endereço da string a printar
 printa_ate_255
     ld a,(hl)               ; Le para A o valor que esta no endereço em HL
-    cp 255                  ; Se for 255...
+    cp ffh                  ; Se for 255...
     jr z, mainloop          ; então já se imprimiu tudo e é para sair
     rst 10h                 ; Syscall para imprimir o no ecrã o que estiver em A
     inc hl                  ; Incrementa o valor de HL
