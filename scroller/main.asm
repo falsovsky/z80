@@ -17,33 +17,38 @@ start
 
     call clear_screen       ; Limpa o ecrã
 
-    ld a, 9                 ; Imprime uma linha de numeros uma
-    call printnumbers       ; linha acima do scroller
-    ld a, 11                ; e outra abaixo do scroller
+    ; Flood de numeros em todas as linhas
+    ld a, 0                 ; Começa na linha 0
+    ld b, 22                ; Repete nas 22 linhas
+lol_flood
+    ld c, a                 ; Guarda o A em C e o B em D porque
+    ld d, b                 ; são alterados no call
     call printnumbers
+    ld a, c                 ; Le o A de volta
+    inc a                   ; Proxima linha
+    ld b, d                 ; Le o B de volta
+    djnz lol_flood          ; B-- , se for != 0 salta
 
     ld hl, mystr            ; Le para HL o endereço da string a printar
-
 printa_ate_255
     ld a,(hl)               ; Le para A o valor que esta no endereço em HL
     cp 255                  ; Se for 255...
     jr z, mainloop          ; então já se imprimiu tudo e é para sair
-
-    push hl                 ; guarda HL na Stack
-                            ; (não sei se é alterado com o RST $10) 
     rst 10h                 ; Syscall para imprimir o no ecrã o que estiver em A
-    pop hl                  ; Tira o HL da stack
-
     inc hl                  ; Incrementa o valor de HL
                             ; Passa a ter o endereço do proximo caracater da str
-
     jr printa_ate_255       ; Volta ao inicio da rotina
 
 mainloop
     ld a, 0                 ; O endereço $5C08 tem o valor ASCII da ultima tecla
     ld (5C08h), a           ; pressionada, vamos limpar isso
-    
-    call scroll             ; Scrolla
+
+    ld hl, 4820h            ; Linha 9
+    call scroll_direita
+    ld hl, 4840h            ; Linha 10
+    call scroll_esquerda
+    ld hl, 4860h            ; Linha 11
+    call scroll_direita
     
     ld a, 1
     call delay              ; Chama a rotina de delay(1)
@@ -56,10 +61,10 @@ exit
     pop bc                  ; Tira o BC da Stack
     ret                     ; Sai para o BASIC
 
-INCLUDE "scroll_pixel.asm"  ; Scroller pixel a pixel
-;INCLUDE "scroll_pc.asm"    ; Scroller 8 pixels de cada vez
-INCLUDE "delay.asm"         ; Rotina de delay
-INCLUDE "clear.asm"         ; Rotina para limpar o ecrã
-INCLUDE "printnumbers.asm"  ; Rotina para printar numeros
+INCLUDE "scroll_esquerda.asm"
+INCLUDE "scroll_direita.asm"
+INCLUDE "delay.asm"
+INCLUDE "clear.asm"
+INCLUDE "printnumbers.asm"
 
 end start

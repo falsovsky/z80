@@ -3,7 +3,7 @@
 delay
     push bc
 delay_start
-    ld c, 20
+    ld c, 10
 delay_loop2
     ld b, 0
 delay_loop1
