@@ -2,6 +2,8 @@ org 30000
 
 tv_flag equ 5c3ch           ; Endereço que contem flags da tv
 last_k  equ 5c08h           ; Contem a ultima tecla pressionada
+k_cur   equ 5c5bh           ; Contem a posição do cursor - TODO: Usar isto
+    
 ; Video RAM
 LINHA9  equ 4820h
 LINHA10 equ 4840h
