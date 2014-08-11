@@ -2,9 +2,9 @@ org 30000
  
 tv_flag    equ 5C3Ch
 
-; 16 È para definir o INK
-; 17 È para definir o PAPER
-; 22 È para definir as Cordenadas Y,X
+; 16 √© para definir o INK
+; 17 √© para definir o PAPER
+; 22 √© para definir as Cordenadas Y,X
 ; 255 Marcador de fim da string
 mystr db 22,10,0, 16, 7, 17, 2, " ", 16,0, 17,1, ".o0O0o.   ", 17, 5, 16, 2, "LOL GORDOS", 17, 1, 16,6, "   .o0O0o.", 16, 7, 17, 2, " ", 255
 
@@ -12,38 +12,38 @@ start
     xor a                   ; O mesmo que LD a, 0
     ld (tv_flag), a         ; Directs rst 10h output to main screen.
     
-    push bc                 ; Parece que È algum standard guardar o BC 
+    push bc                 ; Parece que √© algum standard guardar o BC 
 							; na stack, e tirar no fim do programa.
 
-    ld hl, mystr            ; Le para HL o endereÁo da string a printar
+    ld hl, mystr            ; Le para HL o endere√ßo da string a printar
     
 printa_ate_255
-    ld a,(hl)               ; Le para A o valor que esta no endereÁo em HL
+    ld a,(hl)               ; Le para A o valor que esta no endere√ßo em HL
     cp 255                  ; Se for 255...
-    jr z, mainloop          ; ent„o j· se imprimiu tudo e È para sair
+    jr z, mainloop          ; ent√£o j√° se imprimiu tudo e √© para sair
     
     push hl                 ; guarda HL na Stack
-                            ; (n„o sei se È alterado com o RST $10) 
-    rst 10h                 ; Syscall para imprimir o no ecr„ o que estiver em A
+                            ; (n√£o sei se √© alterado com o RST $10) 
+    rst 10h                 ; Syscall para imprimir o no ecr√£ o que estiver em A
     pop hl                  ; Tira o HL da stack
     
     inc hl                  ; Incrementa o valor de HL
-                            ; Passa a ter o endereÁo do proximo caracater da str
+                            ; Passa a ter o endere√ßo do proximo caracater da str
                            
     jr printa_ate_255       ; Volta ao inicio da rotina
 
 mainloop
-    ld a, 0                ; O endereÁo $5C08 tem o valor ASCII da ultima tecla
+    ld a, 0                ; O endere√ßo $5C08 tem o valor ASCII da ultima tecla
     ld (5C08h), a          ; pressionada, vamos limpar isso
     
-;   call scrollaPC         ; Scrolla com a rotina do Paradise CafÈ
+;   call scrollaPC         ; Scrolla com a rotina do Paradise Caf√©
     call scrolla           ; Scrolla pixel a pixel
     
     ld a, 1                 
     call delay             ; Chama a rotina de delay(1)
     
-    ld a, (5C08h)          ; Se o valor em $5C08 ainda for 0, È porque ainda  
-    cp 0                   ; n„o se pressionou nenhuma tecla, por isso...
+    ld a, (5C08h)          ; Se o valor em $5C08 ainda for 0, √© porque ainda  
+    cp 0                   ; n√£o se pressionou nenhuma tecla, por isso...
     jr Z, mainloop         ; repete
  
 exit

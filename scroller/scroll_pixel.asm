@@ -1,12 +1,12 @@
 tmpScroll1 db  0,0
 ultimoaddr db  0,0
-videoAddr  equ 4840h        ; Endereço de Memoria Video da Linha 10
+videoAddr  equ 4840h        ; EndereÃ§o de Memoria Video da Linha 10
 
 ; Rotina de scroll de texto da direita para a esquerda pixel a pixel
 scrolla
-    ld hl, videoAddr       ; Endereço de Memoria Video a ser manipulado
+    ld hl, videoAddr       ; EndereÃ§o de Memoria Video a ser manipulado
     ld c, 8                ; Numero de vezes que a rotina vai correr
-                           ; 8 é o numero de linhas de pixeis a scrollar
+                           ; 8 Ã© o numero de linhas de pixeis a scrollar
 
 ; Loop1     
 scrolla_0
@@ -15,10 +15,10 @@ scrolla_0
     ld hl, (tmpScroll1)    ; Le o valor de tmp1 para HL
     
     inc h                  ; Incrementa H, mas como estamos a trabalhar com um
-                           ; endereço de 16bits, na realidade vai adicionar 
+                           ; endereÃ§o de 16bits, na realidade vai adicionar 
                            ; $100 a HL
                            ; Isto vai fazer com que a segunda rotina seja
-                           ; chamada com os seguintes endereços em tmp1 
+                           ; chamada com os seguintes endereÃ§os em tmp1 
                            ; videoAddr, videoAddr+$100 videoAddr+$200,
                            ; ..., videoAddr+$700
                            
@@ -30,13 +30,13 @@ scrolla_0
 scrolla_1
     ld hl, (tmpScroll1)    ; Le o argumento tmp1 para HL
     
-    ; Soma $1F ao endereço para começar no fim da linha, tudo à direita
+    ; Soma $1F ao endereÃ§o para comeÃ§ar no fim da linha, tudo Ã  direita
     push bc
     ;ld bc, 1Fh
     ld bc, 20h
     adc hl, bc
 
-    ; Guarda o endereço do fim da linha em (ultimoaddr)
+    ; Guarda o endereÃ§o do fim da linha em (ultimoaddr)
     ld (ultimoaddr), hl
     pop bc
 

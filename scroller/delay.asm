@@ -1,5 +1,5 @@
 ; Rotina de delay variavel, conforme o valor definido em A antes de a chamar
-; Ripada do Paradise Café 
+; Ripada do Paradise CafÃ© 
 delay
     push bc
 delay_start

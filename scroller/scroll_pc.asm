@@ -1,13 +1,13 @@
 tmpScroll1 db  0,0
 tmpScroll2 db  0
-videoAddr  equ 4840h        ; EndereÁo de Memoria Video da Linha 10
+videoAddr  equ 4840h        ; Endere√ßo de Memoria Video da Linha 10
 
 ; Rotina de scroll de texto da direita para a esquerda
-; Ripada do Paradise CafÈ
+; Ripada do Paradise Caf√©
 scrollaPC
-    ld hl, videoAddr       ; EndereÁo de Memoria Video a ser manipulado 
+    ld hl, videoAddr       ; Endere√ßo de Memoria Video a ser manipulado 
     ld c, 8                ; Numero de vezes que a rotina vai correr
-                           ; 8 porque È o numero de pixels a scrollar
+                           ; 8 porque √© o numero de pixels a scrollar
 
 ; Loop1     
 scrollaPC_0
@@ -16,10 +16,10 @@ scrollaPC_0
     ld hl, (tmpScroll1)    ; Le o valor de tmp1 para HL
     
     inc h                  ; Incrementa H, mas como estamos a trabalhar com um
-                           ; endereÁo de 16bits, na realidade vai adicionar 
+                           ; endere√ßo de 16bits, na realidade vai adicionar 
                            ; $100 a HL
                            ; Isto vai fazer com que a segunda rotina seja
-                           ; chamada com os seguintes endereÁos em tmp1 
+                           ; chamada com os seguintes endere√ßos em tmp1 
                            ; videoAddr, videoAddr+$100 videoAddr+$200,
                            ; ..., videoAddr+$700
                            
@@ -36,11 +36,11 @@ scrollaPC_1
     ld d, h                ; DE = HL
     ld e, l                ;
     
-    ld a, (hl)             ; Le o valor dos 8 pixeis no endereÁo definido em HL
+    ld a, (hl)             ; Le o valor dos 8 pixeis no endere√ßo definido em HL
     ld (tmpScroll2), a     ; Guarda o valor em tmp2
-                           ; Isto vai guardar o valor dos 8 pixels mais ‡ 
-                           ; esquerda, que posteriormente v„o ser postos o 
-                           ; mais ‡ direita
+                           ; Isto vai guardar o valor dos 8 pixels mais √† 
+                           ; esquerda, que posteriormente v√£o ser postos o 
+                           ; mais √† direita
  
 ; Loop2
 scrollaPC_2
@@ -48,10 +48,10 @@ scrollaPC_2
                            ; em HL 
     
     ld a, (hl)             ; Le o valor dos proximos 8 pixeis 
-    ld (de), a             ; Guarda-os na posiÁ„o anterior
+    ld (de), a             ; Guarda-os na posi√ß√£o anterior
     inc de                 ; Incrementa DE, fica com o mesmo valor de HL
     djnz scrollaPC_2       ; b--, se b != corre novamente o Loop2
     
     ld a, (tmpScroll2)     ; Le o valor dos 8 pixeis guardados inicialmente 
-    ld (de), a             ; Mete-os na posiÁ„o mais ‡ direita
+    ld (de), a             ; Mete-os na posi√ß√£o mais √† direita
     ret
