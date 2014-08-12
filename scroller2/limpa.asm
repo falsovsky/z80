@@ -31,7 +31,7 @@ screen_attribute equ $47
 ; Valor de 0 a 7
 border_color     equ $0
 
-clear_screen
+limpa_ecra
     ld a, screen_attribute
     ld (attr_p), a      ; Variavel de sistema que permite definir
                         ; o ink, paper, brightness e flash
