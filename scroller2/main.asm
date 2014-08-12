@@ -8,7 +8,9 @@ k_cur   equ $5c5b           ; Contem a posição do cursor - TODO: Usar isto
                             ; $5d16
 
 LINHA10 equ $4840
-aids    db  $0
+
+mystr db 22,9,0, 16,6, "o_barbas disse:", 255
+aids    db  $8
 
 start
     xor a                   ; O mesmo que LD a, 0
@@ -18,8 +20,17 @@ start
                             ; na stack, e tirar no fim do programa.
 
     call clear_screen       ; Limpa o ecrã
+    
+    ld hl, mystr            ; Le para HL o endereço da string a printar
+printa_ate_255
+    ld a,(hl)               ; Le para A o valor que esta no endereço em HL
+    cp $ff                  ; Se for 255...
+    jr z, mainloop          ; então já se imprimiu tudo e é para sair
+    rst $10                 ; Syscall para imprimir o no ecrã o que estiver em A
+    inc hl                  ; Incrementa o valor de HL
+                            ; Passa a ter o endereço do proximo caracater da str
+    jr printa_ate_255       ; Volta ao inicio da rotina
 
-    call scroll_text
 mainloop
     ld a, $0
     ld (last_k), a          ; Limpa o valor da ultima tecla pressionada

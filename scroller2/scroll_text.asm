@@ -1,4 +1,4 @@
-text db "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin commodo metus sed orci fermentum, id mattis quam suscipit OI VIVA O BENFICA!!", 0
+text db "\"SEM QUERER MAGOAR O MEU BENFICA SO SABE GANHAR VIVA O BENFICA\" \"DA TRAFARIA ATE AO JAMOR O MEU BENFICA MOSTRA SEMPRE O SEU ESPLENDOR VIVA O BENFICA\" \"MANHA DE NEVOEIRO TARDE DE SOL SOALHEIRO BENFICA SEMPRE O PRIMEIRO VIVA O BENFICA\" \"DUAS VIAGENS SEGUIDAS PARA A ITALIA DAQUI A BOCADO MAIS VALE ABRIR UM BARBAS EM TURIM VIVA O BENFICA\"", 0
 
 chars       equ $5c36   ; Endereço 256 ($100) bytes abaixo da fonte (2 bytes)
                         ; Contem $3c00 inicialmente
@@ -54,15 +54,14 @@ scroll_text_loop
     call copia_para_udg ; Copia a letra para o UDG#1
                         ; O argumento para a rotina é o valor em HL
 
-    ld a, 22
-    rst $10
-    ld a, 0
-    rst $10
-    ld a, 0
-    rst $10
-
-    ld a, $90           ; Imprime UDG#1
-    rst $10
+    ;ld a, 22
+    ;rst $10
+    ;ld a, 0
+    ;rst $10
+    ;ld a, 0
+    ;rst $10
+    ;ld a, $90           ; Imprime UDG#1
+    ;rst $10
 
     pop hl              ; Tira a posição na string da stack
     inc hl              ; Anda para a frente
