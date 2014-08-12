@@ -18,14 +18,13 @@ letra_pos   db  0,0
 scroll_text
     ld hl, text         ; Endereço do primeiro chr
 scroll_text_loop
-    ; A ideia aqui é a seguinte, a primeira letra é um L
-    ; em ASCII do Spectrum o valor é $4C e com esse valor
-    ; pretendo chegar a $3E60 que é onde está a Font dessa
-    ; letra
+    ; Por exemplo, a primeira letra é um L,  em ASCII do 
+    ; Spectrum o valor é $4C e com esse valor pretendo
+    ; chegar a $3E60 que é onde está a Font dessa letra
     
-    ld a, (hl)          ; Le chr da string
+    ld a, (hl)          ; Le chr da string - $4C incialmente
     push hl
-    ld d, 20h           ; Subtrai $20
+    ld d, 20h           ; Subtrai $20 
     sbc a,d             ; Fica-se com $2C
 
     ld h,0              ; H = 0
