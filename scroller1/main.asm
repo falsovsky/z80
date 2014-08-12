@@ -65,7 +65,7 @@ mainloop
 
     ld a, (last_k)          ; Se o valor da ultima tecla pressionada ainda
     cp $0                   ; for 0, é porque ainda não se pressionou nenhuma
-    jr Z, mainloop          ; tecla, por isso... repete
+    jr z, mainloop          ; tecla, por isso... repete
 
 exit
     pop bc                  ; Tira o BC da Stack

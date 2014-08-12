@@ -1,6 +1,7 @@
 org 30000
 
 tv_flag     equ $5c3c       ; Variavel das flags da tv
+last_k      equ $5c08       ; Contem a ultima tecla pressionada
 
 OP_INC_DP   equ $3e
 OP_DEC_DP   equ $3c
@@ -49,6 +50,10 @@ read_bf
     ; .
     cp OP_OUT
     jr z, F_OUT
+    
+    ; ,
+    cp OP_IN
+    jr z, F_IN
 
 continue
     pop hl
@@ -89,6 +94,17 @@ F_OUT
     ld hl, (memory_pos)
     ld a, (hl)
     rst $10
+    ld (hl), a
+    jr continue
+
+F_IN
+    ld a, $0
+    ld (last_k), a          ; Limpa o valor da ultima tecla pressionada
+F_IN_LOOP
+    ld a, (last_k)          ; Se o valor da ultima tecla pressionada ainda
+    cp $0                   ; for 0, é porque ainda não se pressionou nenhuma
+    jr z, F_IN_LOOP         ; tecla, por isso... repete
+    ld hl, (memory_pos)
     ld (hl), a
     jr continue
 
