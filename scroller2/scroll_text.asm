@@ -13,8 +13,8 @@ udg         equ $5c7b   ; Endereço do primeiro user-defined graphics (2 bytes)
 udg_start   equ $ff58   ; User-defined characters, vai até $ffff
                         ; São acessiveis com o caracter $90 até $a4
 
-letra_pos   db  0,0
 text_pos    db  0,0
+char_pos    db  0
 
 scroll_text
     ; Verificar se o valor de text_pos já foi alguma vez alterado
@@ -52,14 +52,14 @@ scroll_text_loop
     ld hl, font_start
     add hl, de          ; $3C00 + $260 = $3E60
 
-    ld (letra_pos), hl  ; Guarda o valor em letra_pos
-
     call copia_para_udg ; Copia a letra para o UDG#1
+                        ; O argumento para a rotina é o valor em HL
+
     ld a, $90           ; Imprime UDG#1
     rst $10
+
     pop hl              ; Tira a posição na string da stack
     inc hl              ; Anda para a frente
-
     ld a, (hl)          ; Le o proximo valor
     cp 0                ; Se for 0 estamos no fim da string
     jr z, reset         ; Reset à posição
@@ -71,13 +71,13 @@ the_end
     ret
 
 copia_para_udg
-    ld hl, (letra_pos)  ; Posição da font da letra a copiar
+    ; Está a contar que o endereço de origem esteja em HL
     ld b, $8            ; Copiar 8 bytes, cada letra são 8x8
     ld de, udg_start    ; Destino
-copia_para_udg_r
+copia_para_udg_loop
     ld a, (hl)          ; Le origem
     ld (de), a          ; Copia para destino
     inc hl              ; Incrementa ambos
     inc de
-    djnz copia_para_udg_r ; b--, se b != 0 salta
-    ret
+    djnz copia_para_udg_loop ; b--, se b != 0 salta
+    ret   
