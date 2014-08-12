@@ -61,6 +61,7 @@ continue
     jr read_bf
 
 end_main
+    pop hl
     pop bc                  ; Tira o BC da stack
     ret                     ; Sai para o BASIC
 
