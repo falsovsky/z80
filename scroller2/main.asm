@@ -2,33 +2,27 @@ org 30000
 
 tv_flag equ $5c3c           ; Endereço que contem flags da tv
 last_k  equ $5c08           ; Contem a ultima tecla pressionada
-
-k_cur   equ $5c5b           ; Contem a posição do cursor - TODO: Usar isto
-                            ; Depois de meter a 10,6 (y,x) fica com
-                            ; $5d16
-
 LINHA10 equ $4840
 
-mystr db 22,9,0, 16,6, "o_barbas disse:", 255
-scroll_udg    db  $8        ; Numero de pixeis para scrollados no UDG#1
+o_barbas    db  22,9,0, 16,6, "o_barbas disse:", 255
+scroll_udg  db  $8          ; Numero de pixeis para scrollados no UDG#1
                             ; Inicializado a 8 para "pedir" uma nova
                             ; letra quando corre pela primeira vez.
 
 start
     xor a                   ; O mesmo que LD a, 0
     ld (tv_flag), a         ; Directs rst 10h output to main screen.
-
     push bc                 ; Parece que é algum standard guardar o BC 
                             ; na stack, e tirar no fim do programa.
 
     call clear_screen       ; Limpa o ecrã
     
-    ld hl, mystr            ; Le para HL o endereço da string a printar
+    ld hl, o_barbas         ; Le para HL o endereço da string a printar
 printa_ate_255
     ld a,(hl)               ; Le para A o valor que esta no endereço em HL
     cp $ff                  ; Se for 255...
     jr z, main_loop         ; então já se imprimiu tudo e é para sair
-    rst $10                 ; Syscall para imprimir o no ecrã o que estiver em A
+    rst $10
     inc hl                  ; Incrementa o valor de HL
                             ; Passa a ter o endereço do proximo caracater da str
     jr printa_ate_255       ; Volta ao inicio da rotina

@@ -41,5 +41,5 @@ clear_screen
     call rom_define_borda+$7
     ; Chama a rotina da ROM para actualizar a borda, mas salta 7
     ; bytes à frente, porque são para ler o valor da borda do 
-    ; BASIC. O valor fica guardado em 23624.
+    ; BASIC. O valor fica guardado em $5c48.
     ret
