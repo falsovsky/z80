@@ -69,15 +69,6 @@
 					container: 'jsspeccy',
 					controller: jsspeccy
 				});
-				$('#example-games').change(function() {
-					var filename = $(this).val();
-					if (filename) {
-						jsspeccy.loadFromUrl(
-							'http://jsspeccy.zxdemo.org/games/' + filename,
-							{'autoload': true}
-						);
-					}
-				})
 			});
 		</script>
 	</head>
@@ -88,7 +79,6 @@
 				<li><button class="stop-start" title="Stop / start">stop / start</button></li>
 				<li><button class="reset" title="Reset the Spectrum">reset</button></li>
 				<li><button class="audio" title="Audio on/off">audio on/off</button></li>
-				<li><button class="open" title="Open file">open file</button></li>
 				<li><button class="about" title="About JSSpeccy">about</button></li>
 				<li>
 					<div>
@@ -100,22 +90,6 @@
 				</li>
 			</ul>
 
-			<div class="panel open-file">
-				<button class="close">close</button>
-
-				<h2>Load from disk: <span class="note">.tap, .tzx, .sna, .z80 files supported</span></h2><input type="file">
-
-				<h2>Load from web:</h2><input type="url"><button class="open-url">Open URL</button>
-
-				<h2>Search World Of Spectrum:</h2>
-				<form class="search-wos">
-					<input type="search">
-					<input type="submit" value="Search title">
-				</form>
-				<select style="width: 250px" size="8" class="wos-matches"></select>
-				<select style="width: 250px" size="8" class="wos-downloads"></select>
-				<button class="open-from-wos">Open file</button>
-			</div>
 			<div class="panel about">
 				<button class="close">close</button>
 
