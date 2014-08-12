@@ -36,16 +36,16 @@ scroll_text_loop
     ld e, l             ; DE = HL
     
     ld hl, font_start
-    adc hl, de          ; $3C00 + $260 = $3E60   
+    add hl, de          ; $3C00 + $260 = $3E60
     
     ld (letra_pos), hl  ; Guarda o valor em letra_pos
     
     call copia_para_udg ; Copia a letra para o UDG#1
-    ld a, $90           ; Imprime a primeira letra do UDG
+    ld a, $90           ; Imprime UDG#1
     rst $10
     pop hl              ; Tira a posição da string da stack
     inc hl              ; Anda para a frente
-    ld a, (hl)
+    ld a, (hl)          ; Le o proximo valor
     cp 0                ; Ve se já estamos no fim
     jr nz, scroll_text_loop ; Repete no proximo chr da string
     ret

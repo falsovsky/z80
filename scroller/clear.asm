@@ -1,7 +1,7 @@
-attr_p              equ 5c8dh; Endereço que contem as cores permanentes
-bordcr              equ 5c48h; Endereço que contem a cor da borda
-rom_limpa_ecra      equ 0dafh; Rotina da ROM que limpa o ecrã
-rom_define_borda    equ 2294h; Rotina da ROM que define a borda
+attr_p              equ $5c8d; Endereço que contem as cores permanentes
+bordcr              equ $5c48; Endereço que contem a cor da borda
+rom_limpa_ecra      equ $0daf; Rotina da ROM que limpa o ecrã
+rom_define_borda    equ $2294; Rotina da ROM que define a borda
 
 ; Cores
 ; Numero | Binario | Nome
@@ -26,10 +26,10 @@ rom_define_borda    equ 2294h; Rotina da ROM que define a borda
 ; 01000110 = 70 = $46
 ; 01000000 = 64 = $40 - Tudo preto
 ; 01000111 = 71 = $47 - Fundo preto Texto Branco
-screen_attribute equ 47h
+screen_attribute equ $47
 
 ; Valor de 0 a 7
-border_color     equ 00h
+border_color     equ $0
 
 clear_screen
     ld a, screen_attribute
@@ -38,7 +38,7 @@ clear_screen
     call rom_limpa_ecra ; Clear screen
 
     ld a, border_color  ; Cor do border
-    call rom_define_borda+7h
+    call rom_define_borda+$7
     ; Chama a rotina da ROM para actualizar a borda, mas salta 7
     ; bytes à frente, porque são para ler o valor da borda do 
     ; BASIC. O valor fica guardado em 23624.

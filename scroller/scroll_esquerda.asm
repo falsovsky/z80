@@ -8,7 +8,7 @@ ultimoaddr   db 0,0
 ; O endereço inicial tem de vir em HL
 scroll_esquerda
 ;    ld hl, videoAddr        ; Endereço de Memoria Video a ser manipulado
-    ld c, 8h                ; Numero de vezes que a rotina vai correr
+    ld c, $8                ; Numero de vezes que a rotina vai correr
                             ; 8 é o numero de linhas de pixeis a scrollar
 
 ; Loop1
@@ -34,14 +34,14 @@ scroll_esquerda_1
     ld hl, (addractual1)    ; Le o argumento tmp1 para HL
 
     push bc
-    ld bc, 1fh              ; Soma $1f ao endereço para começar
+    ld bc, $1f              ; Soma $1f ao endereço para começar
     adc hl, bc              ; no fim da linha, tudo à direita
                             ; Cada linha tem 32 bytes 
 
     ld (ultimoaddr), hl     ; Guarda o endereço do fim da linha
     pop bc
 
-    ld b, 20h               ; Numero de vezes que vai correr
+    ld b, $20               ; Numero de vezes que vai correr
 
 ; Vai começar por fazer um rotate left à coluna mais à direita, e
 ; guarda o bit que se perde na carry, que vai ser usado como o
@@ -73,7 +73,7 @@ scroll_esquerda_2
     ; Se tem carry é porque se perdeu um pixel no ultimo
     ; rotate, então tem de se settar o bit 0 do coluna mais
     ; à direita a 1
-    or 1                    ; bit 0 = 1
+    or $1                   ; bit 0 = 1
 scroll_esquerda_sem_carry
     ld (hl), a              ; Actualiza
     ret

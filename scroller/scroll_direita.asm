@@ -8,7 +8,7 @@ primeiroaddr db 0,0
 ; O endereço inicial tem de vir em HL
 scroll_direita
 ;    ld hl, videoAddr2       ; Endereço de Memoria Video a ser manipulado
-    ld c, 8h                ; Numero de vezes que a rotina vai correr
+    ld c, $8                ; Numero de vezes que a rotina vai correr
                             ; 8 é o numero de linhas de pixeis a scrollar
 
 ; Loop1
@@ -33,7 +33,7 @@ scroll_direita_0
 scroll_direita_1
     ld hl, (addractual2)    ; Le o argumento tmp1 para HL
     ld (primeiroaddr), hl
-    ld b, 20h               ; Numero de vezes que vai correr
+    ld b, $20               ; Numero de vezes que vai correr
 ; Loop2
 scroll_direita_2
     ld a, (hl)              ; Faz um rotate right aos 8 pixels no
@@ -47,7 +47,7 @@ scroll_direita_2
     ld a, (hl)              ; mais à esquerda, em A
     
     jr nc, scroll_direita_sem_carry ; Não tem carry? vai para o fim
-    or 80h                  ; bit 7 = 1
+    or $80                  ; bit 7 = 1
 scroll_direita_sem_carry
     ld (hl), a              ; Actualiza
     ret
