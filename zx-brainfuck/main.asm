@@ -14,7 +14,9 @@ OP_JMP_BCK  equ "]"
 
 ;brainfuck   db  "++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>.", 0
 brainfuck   db  "+++++++++++++++++++++++++++++++++.", 0
+;brainfuck   db  "++++[>++++++++++<-]>++.>+++++++++++++.<<++[>.<-]>>.<<+++[>.<-]>>.<<++++[>.<-]>>.<<+++++[>.<-]>>.", 0
 memory_pos  db  $0,$80
+source_pos  db  $0
 
 start                       ; Começa em $75a2
     xor a                   ; O mesmo que LD a, 0
@@ -22,10 +24,15 @@ start                       ; Começa em $75a2
     push bc                 ; Guarda BC na stack
 
 main
-    ld hl, brainfuck
+    ;ld hl, brainfuck
 read_bf
-    ld a,(hl)
-    push hl
+    ld hl, brainfuck
+    ld a, (source_pos)
+    ld d, $0
+    ld e, a
+
+    add hl, de
+    ld a, (hl)
 
     ; EOF
     cp $0
@@ -54,48 +61,56 @@ read_bf
     ; ,
     cp OP_IN
     jr z, F_IN
+    
+    ; [
+    cp OP_JMP_FWD
+    jr z, F_JMP_FWD
+    
+    ; ]
+    cp OP_JMP_BCK
+    jr z, F_JMP_BCK
 
 continue
-    pop hl
     inc hl
+    ld a, (source_pos)
+    inc a
+    ld (source_pos), a
     jr read_bf
 
 end_main
-    pop hl
     pop bc                  ; Tira o BC da stack
     ret                     ; Sai para o BASIC
 
 F_INC_DP
-    ld hl, (memory_pos)
-    inc hl
-    ld (memory_pos), hl
+    ld a, (memory_pos)
+    inc a
+    ld (memory_pos), a
     jr continue
 
 F_DEC_DP
-    ld hl, (memory_pos)
-    dec hl
-    ld (memory_pos), hl
+    ld a, (memory_pos)
+    dec a
+    ld (memory_pos), a
     jr continue
 
 F_INC_VAL
-    ld hl, (memory_pos)
-    ld a, (hl)
+    ld de, (memory_pos)
+    ld a, (de)
     inc a
-    ld (hl), a
+    ld (de), a
     jr continue
 
 F_DEC_VAL
-    ld hl, (memory_pos)
-    ld a, (hl)
+    ld de, (memory_pos)
+    ld a, (de)
     dec a
-    ld (hl), a
+    ld (de), a
     jr continue
 
 F_OUT
-    ld hl, (memory_pos)
-    ld a, (hl)
+    ld de, (memory_pos)
+    ld a, (de)
     rst $10
-    ld (hl), a
     jr continue
 
 F_IN
@@ -105,10 +120,19 @@ F_IN_LOOP
     ld a, (last_k)          ; Se o valor da ultima tecla pressionada ainda
     cp $0                   ; for 0, é porque ainda não se pressionou nenhuma
     jr z, F_IN_LOOP         ; tecla, por isso... repete
-    ld hl, (memory_pos)
-    ld (hl), a
+    ld de, (memory_pos)
+    ld (de), a
     jr continue
-    
 
+F_JMP_FWD
+    ld d, h
+    ld e, l
+    push de
+    jr continue
+
+F_JMP_BCK
+    pop de
+    ld (memory_pos), hl
+    jp read_bf
 
 end start
