@@ -5,7 +5,7 @@ last_k  equ $5c08           ; Contem a ultima tecla pressionada
 LINHA10 equ $4840
 
 o_barbas    db  22,9,0, 16,6, "o_barbas disse:", 255
-scroll_udg  db  $8          ; Numero de pixeis para scrollados no UDG#1
+scroll_udg  db  $8          ; Numero de pixeis já scrollados no UDG#1
                             ; Inicializado a 8 para "pedir" uma nova
                             ; letra quando corre pela primeira vez.
 
