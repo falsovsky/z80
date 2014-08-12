@@ -24,19 +24,20 @@ main
     ld hl, brainfuck
 read_bf
     ld a,(hl)
-    
+    push hl
+
     ; EOF
     cp 0
     jr z, end_main
-    
+
     ; >
     cp OP_INC_DP
     jr z, F_INC_DP
-    
+
     ; <
     cp OP_DEC_DP
     jr z, F_DEC_DP
-    
+
     ; +
     cp OP_INC_VAL
     jr z, F_INC_VAL
@@ -44,55 +45,47 @@ read_bf
     ; +
     cp OP_DEC_VAL
     jr z, F_DEC_VAL
-    
+
     ; .
     cp OP_OUT
     jr z, F_OUT
-    
+
 continue
+    pop hl
     inc hl
     jr read_bf
-    
+
 end_main
     pop bc                  ; Tira o BC da stack
     ret                     ; Sai para o BASIC
 
 F_INC_DP
-    push hl
     ld hl, (memory_pos)
     inc hl
     ld (memory_pos), hl
-    pop hl
     jr continue
-    
+
 F_DEC_DP
-    push hl
     ld hl, (memory_pos)
     dec hl
     ld (memory_pos), hl
-    pop hl
     jr continue
 
 F_INC_VAL
-    push hl
     ld hl, (memory_pos)
     ld a, (hl)
     inc a
     ld (hl), a
-    pop hl
     jr continue
 
 F_DEC_VAL
-    push hl
     ld hl, (memory_pos)
     ld a, (hl)
     dec a
     ld (hl), a
-    pop hl
     jr continue
-    
+
 F_OUT
-    push hl
     ld hl, (memory_pos)
     ld a, (hl)
     rst $10
