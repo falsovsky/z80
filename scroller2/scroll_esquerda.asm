@@ -7,7 +7,7 @@ scroll_esquerda
     ld c, $8                ; Numero de vezes que a rotina vai correr
                             ; 8 é o numero de linhas de pixeis a scrollar
 
-    ld a, 0
+    ld a, $0
     ld (linha_actual), a    ; Começa na linha 0
 
 ; Loop1
@@ -63,8 +63,8 @@ scrolla_linha_loop
     ; Já processou tudo ate à esquerda, vamos passar o resto do 
     ; UDG#1
     ld a, (linha_actual)    ; Le a linha actual para A
-    ld d, $0
-    ld e, a                 ; DE = 0|A
+    ld d, $0                ; D = $0
+    ld e, a                 ; E = A
     ld hl, udg_start        ; Endereço onde começa o UDG#1
     add hl, de              ; Soma a linha actual
 
