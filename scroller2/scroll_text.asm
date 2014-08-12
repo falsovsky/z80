@@ -14,30 +14,22 @@ udg_start   equ $ff58   ; User-defined characters, vai até $ffff
                         ; São acessiveis com o caracter $90 até $a4
 
 text_pos    db  0,0
-char_pos    db  0
+first_time  db  1
 
 scroll_text
-    ld a, 22
-    rst $10
-    ld a, 0
-    rst $10
-    ld a, 0
-    rst $10
-
-    ; Verificar se o valor de text_pos já foi alguma vez alterado
-    ld a, (text_pos)    ; Le o primeiro byte
-    cp 0                ; Se for 0 é a primeira vez senão
-    jr nz, segundo_byte ; vou verificar o segundo byte
-    jr z, first_run
-segundo_byte
-    ld a, (text_pos+1)  ; Le o segundo byte
-    cp 0                ; Se for 0 é a primeira vez 
-    jr z, first_run
-    ld hl, (text_pos)   ; Senão usa o valor de (text_pos)
-    jr scroll_text_loop
+    ld a, (first_time)
+    cp $1
+    jr nz, other_runs
 first_run
-    ; Primeira vez a correr, usa o endereço de text
+    ; Primeira vez a correr, usa a posicao 0 da string
+    ld a, 0
+    ld (first_time), a  ; first_time = 0
     ld hl, text         ; Endereço do primeiro chr
+    jr scroll_text_loop
+other_runs
+    ; Usa a posição guardada em text_pos
+    ld hl, (text_pos)
+    
 scroll_text_loop
     ; Por exemplo, a primeira letra é um L. No ASCII do 
     ; Spectrum o valor dela é $4C e com esse valor pretendo
@@ -62,6 +54,13 @@ scroll_text_loop
     call copia_para_udg ; Copia a letra para o UDG#1
                         ; O argumento para a rotina é o valor em HL
 
+    ld a, 22
+    rst $10
+    ld a, 0
+    rst $10
+    ld a, 0
+    rst $10
+
     ld a, $90           ; Imprime UDG#1
     rst $10
 
@@ -72,7 +71,8 @@ scroll_text_loop
     jr z, reset         ; Reset à posição
     jr the_end          ; Continua
 reset
-    ld hl, text         ; Mete a posição na string a 0
+    ld a, 1
+    ld (first_time), a  ; Manda meter a posicao a 0 da proxima vez
 the_end
     ld (text_pos), hl   ; Guarda a posição
     ret
