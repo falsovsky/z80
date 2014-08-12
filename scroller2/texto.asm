@@ -16,20 +16,20 @@ udg_start   equ $ff58       ; User-defined characters, vai até $ffff
 posicao_addr    db  0,0     ; Contem o endereço da posição actual na string
 reset_posicao   db  1       ; Se estiver a 1 a posição é resetada a 0
 
-scroll_text
+obtem_proxima_letra
     ld a, (reset_posicao)
     cp $1                   ; Se não for para meter a posição a 0 salta
-    jr nz, sem_reset
+    jr nz, proxima_letra_sem_reset
     ; o reset_posicao está a 1, meter a posicao na string a 0
     ld a, 0
     ld (reset_posicao), a   ; reset_posicao = 0
     ld hl, text             ; Endereço do primeiro chr
-    jr scroll_text_loop     ;
-sem_reset
+    jr proxima_letra_loop
+proxima_letra_sem_reset
     ; Usa a posição guardada em posicao_addr
     ld hl, (posicao_addr)
 
-scroll_text_loop
+proxima_letra_loop
     ; Por exemplo, a primeira letra é um L. No ASCII do 
     ; Spectrum o valor dela é $4C e com esse valor pretendo
     ; chegar a $3E60 que é onde está a font dela
@@ -50,30 +50,31 @@ scroll_text_loop
     ld hl, font_start
     add hl, de              ; $3C00 + $260 = $3E60
 
-    call copia_para_udg     ; Copia a letra para o UDG#1
+    call proxima_letra_udg  ; Copia a letra para o UDG#1
                             ; O argumento para a rotina é o valor em HL
 
     pop hl                  ; Tira a posição na string da stack
     inc hl                  ; Anda para a frente
     ld a, (hl)              ; Le o proximo valor
     cp $0                   ; Se for 0 estamos no fim da string
-    jr z, set_reset         ; Manda fazer reset à posição
-    jr scroll_text_fim      ; Senão continua
-set_reset
-    ld a, $1
-    ld (reset_posicao), a   ; Manda meter a posicao a 0 da proxima vez
-scroll_text_fim
+    jr z, proxima_letra_sem_reset ; Manda fazer reset à posição
+    jr proxima_letra_fim    ; Senão continua
+proxima_letra_sem_reset
+    ld a, $1                ; Manda meter a posicao a 0 na proxima
+    ld (reset_posicao), a   ; iteração
+proxima_letra_fim
     ld (posicao_addr), hl   ; Guarda a posição
     ret
 
-copia_para_udg
+; copia a letra para o UDG#1
+proxima_letra_udg
     ; Está a contar que o endereço de origem esteja em HL
     ld b, $8                ; Copiar 8 bytes, cada letra são 8x8
     ld de, udg_start        ; Destino
-copia_para_udg_loop
+proxima_letra_udg_loop
     ld a, (hl)              ; Le origem
     ld (de), a              ; Copia para destino
     inc hl                  ; Incrementa ambos
     inc de
-    djnz copia_para_udg_loop ; b--, se b != 0 salta
+    djnz proxima_letra_udg_loop ; b--, se b != 0 salta
     ret

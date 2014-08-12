@@ -40,7 +40,7 @@ main_loop
     ld a, (scroll_udg)      ; Le o numero de pixeis já scrollados no UDG#1
     cp $8                   ; São 8?
     jr nz, main_loop_scroll ; Não..
-    call scroll_text        ; Sim, manda meter uma nova letra em UDG#1
+    call obtem_proxima_letra ; Sim, manda meter uma nova letra em UDG#1
     ld a, 0
     ld (scroll_udg), a      ; 0 pixeis ainda scrollados no novo UDG#1
 
@@ -65,7 +65,7 @@ exit
 
 INCLUDE "delay.asm"
 INCLUDE "clear.asm"
-INCLUDE "scroll_text.asm"
-INCLUDE "scroll_esquerda.asm"
+INCLUDE "texto.asm"
+INCLUDE "scroll.asm"
 
 end start

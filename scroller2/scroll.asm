@@ -3,7 +3,7 @@ linha_actual db 0       ; Linha actual
 ultima_addr  db 0,0     ; Endereço da coluna mais à direita da linha actual
 
 ; O endereço inicial tem de vir em HL
-scroll_esquerda
+scroll
     ld c, $8                ; Numero de vezes que a rotina vai correr
                             ; 8 é o numero de linhas de pixeis a scrollar
 
@@ -11,7 +11,7 @@ scroll_esquerda
     ld (linha_actual), a    ; Começa na linha 0
 
 ; Loop1
-scroll_esquerda_loop
+scroll_loop
     ld (scroll_addr), hl    ; Guarda o valor de HL (argumento da rotina)
     call scrolla_linha      ; Scrolla uma linha
     ld hl, (scroll_addr)    ; Le o valor de tmp1 para HL
@@ -29,7 +29,7 @@ scroll_esquerda_loop
     ld (linha_actual), a
 
     dec c                   ; Decrementa o contador C
-    jr nz, scroll_esquerda_loop ; Se C != 0 corre novamente o Loop1
+    jr nz, scroll_loop      ; Se C != 0 corre novamente o Loop1
     ret
 
 ; Scrolla a linha que estiver em scroll_addr
