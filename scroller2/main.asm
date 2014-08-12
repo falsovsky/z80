@@ -10,7 +10,9 @@ k_cur   equ $5c5b           ; Contem a posição do cursor - TODO: Usar isto
 LINHA10 equ $4840
 
 mystr db 22,9,0, 16,6, "o_barbas disse:", 255
-aids    db  $8
+scroll_udg    db  $8        ; Numero de pixeis para scrollados no UDG#1
+                            ; Inicializado a 8 para "pedir" uma nova
+                            ; letra quando corre pela primeira vez.
 
 start
     xor a                   ; O mesmo que LD a, 0
@@ -25,36 +27,37 @@ start
 printa_ate_255
     ld a,(hl)               ; Le para A o valor que esta no endereço em HL
     cp $ff                  ; Se for 255...
-    jr z, mainloop          ; então já se imprimiu tudo e é para sair
+    jr z, main_loop         ; então já se imprimiu tudo e é para sair
     rst $10                 ; Syscall para imprimir o no ecrã o que estiver em A
     inc hl                  ; Incrementa o valor de HL
                             ; Passa a ter o endereço do proximo caracater da str
     jr printa_ate_255       ; Volta ao inicio da rotina
 
-mainloop
+main_loop
     ld a, $0
     ld (last_k), a          ; Limpa o valor da ultima tecla pressionada
 
-    ld a, (aids)
-    cp $8
-    jr nz, s_e
-    call scroll_text
+    ld a, (scroll_udg)      ; Le o numero de pixeis já scrollados no UDG#1
+    cp $8                   ; São 8?
+    jr nz, main_loop_scroll ; Não..
+    call scroll_text        ; Sim, manda meter uma nova letra em UDG#1
     ld a, 0
-    ld (aids), a
+    ld (scroll_udg), a      ; 0 pixeis ainda scrollados no novo UDG#1
 
-s_e
+main_loop_scroll
     ld hl, LINHA10
-    call scroll_esquerda
-    ld a, (aids)
-    inc a
-    ld (aids), a
+    call scroll_esquerda    ; Scrolla a linha 10
+    
+    ld a, (scroll_udg)      ; Incrementa o numero de pixeis já scrollados
+    inc a                   ; no UDG#1
+    ld (scroll_udg), a
     
     ld a, $1
     call delay              ; Chama a rotina de delay(1)
 
     ld a, (last_k)          ; Se o valor da ultima tecla pressionada ainda
     cp $0                   ; for 0, é porque ainda não se pressionou nenhuma
-    jr Z, mainloop          ; tecla, por isso... repete
+    jr Z, main_loop         ; tecla, por isso... repete
 
 exit
     pop bc                  ; Tira o BC da Stack
