@@ -42,7 +42,7 @@ read_bf
     cp OP_INC_VAL
     jr z, F_INC_VAL
 
-    ; +
+    ; -
     cp OP_DEC_VAL
     jr z, F_DEC_VAL
 
