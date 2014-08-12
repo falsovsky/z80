@@ -3,7 +3,7 @@ text db "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin commodo 
 chars       equ $5c36   ; Endereço 256 ($100) bytes abaixo da fonte (2 bytes)
                         ; Contem $3c00 inicialmente
 
-font_start  equ $3d00   ; Endereço onde começa a fonte, acaba em $3fff
+font_start  equ $3c00   ; Endereço onde começa a fonte, acaba em $3fff
                         ; Começa com o espaço e acaba no ©
                         ; http://en.wikipedia.org/wiki/ZX_Spectrum_character_set
 
@@ -18,57 +18,46 @@ letra_pos   db  0,0
 scroll_text
     ld hl, text         ; Endereço do primeiro chr
 scroll_text_loop
-    ; Por exemplo, a primeira letra é um L,  em ASCII do 
-    ; Spectrum o valor é $4C e com esse valor pretendo
-    ; chegar a $3E60 que é onde está a Font dessa letra
+    ; Por exemplo, a primeira letra é um L. No ASCII do 
+    ; Spectrum o valor dela é $4C e com esse valor pretendo
+    ; chegar a $3E60 que é onde está a font dela
     
     ld a, (hl)          ; Le chr da string - $4C incialmente
-    push hl
-    ld d, 20h           ; Subtrai $20 
-    sbc a,d             ; Fica-se com $2C
+    push hl             ; Guarda a posição na string na stack
 
     ld h,0              ; H = 0
     ld l,a              ; L = valor em A
-    ld d,h
-    ld e,l              ; DE = HL
-    
-    ; Somar DE a HL 7x
-    adc hl, de          ;  $2C + $2C = $58
-    adc hl, de          ;  $58 + $2C = $84
-    adc hl, de          ;  $84 + $2C = $B0
-    adc hl, de          ;  $B0 + $2C = $DC
-    adc hl, de          ;  $DC + $2C = $108
-    adc hl, de          ; $108 + $2C = $134
-    adc hl, de          ; $134 + $2C = $160
+
+    add hl, hl          ;  $4C +  $4C = $98
+    add hl, hl          ;  $98 +  $98 = $130
+    add hl, hl          ; $130 + $130 = $260
     
     ld d, h
     ld e, l             ; DE = HL
     
     ld hl, font_start
-    adc hl, de          ; $3D00 + $160 = $3E60   
+    adc hl, de          ; $3C00 + $260 = $3E60   
     
     ld (letra_pos), hl  ; Guarda o valor em letra_pos
     
-    call copia_para_udg
-    ld a, $90
+    call copia_para_udg ; Copia a letra para o UDG#1
+    ld a, $90           ; Imprime a primeira letra do UDG
     rst $10
-    pop hl
-    inc hl
+    pop hl              ; Tira a posição da string da stack
+    inc hl              ; Anda para a frente
     ld a, (hl)
-    cp 0
-    jr nz, scroll_text_loop
+    cp 0                ; Ve se já estamos no fim
+    jr nz, scroll_text_loop ; Repete no proximo chr da string
     ret
 
 copia_para_udg
-    push bc
-    ld b, $8            ; Vamos copiar 8 bytes, cada letra são 8x8
-    ld hl, (letra_pos)  ; Posição da letra a copiar
-    ld de, udg_start    ; Le a posicao do destino
+    ld b, $8            ; Copiar 8 bytes, cada letra são 8x8
+    ld hl, (letra_pos)  ; Posição da font da letra a copiar
+    ld de, udg_start    ; Destino
 copia_para_udg_r
     ld a, (hl)          ; Le origem
     ld (de), a          ; Copia para destino
     inc hl              ; Incrementa ambos
     inc de
     djnz copia_para_udg_r ; b--, se b != 0 salta
-    pop bc
     ret
