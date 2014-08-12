@@ -1,16 +1,15 @@
-;videoAddr   equ 4840h      ; Endereço de Memoria Video da Linha 10
-;videoAddr   equ 4940h      ; Faz o mesmo, tenho de entender porque
-
 addractual1  db 0,0
 ultimoaddr   db 0,0
+aids2        db 0
 
 ; Rotina de scroll de texto da direita para a esquerda pixel a pixel
 ; O endereço inicial tem de vir em HL
 scroll_esquerda
-;    ld hl, videoAddr        ; Endereço de Memoria Video a ser manipulado
     ld c, $8                ; Numero de vezes que a rotina vai correr
                             ; 8 é o numero de linhas de pixeis a scrollar
 
+    ld a, 0
+    ld (aids2), a
 ; Loop1
 scroll_esquerda_0
     ld (addractual1), hl    ; Guarda o valor de HL em tmp1
@@ -25,6 +24,10 @@ scroll_esquerda_0
                             ; videoAddr, videoAddr+$100 videoAddr+$200,
                             ; ..., videoAddr+$700
 
+    ld a, (aids2)
+    inc a
+    ld (aids2), a
+                            
     dec c                   ; Decrementa o contador C 
     jr nz, scroll_esquerda_0; Se C != 0 corre novamente o Loop1
     ret
@@ -43,15 +46,6 @@ scroll_esquerda_1
 
     ld b, $20               ; Numero de vezes que vai correr
 
-; Vai começar por fazer um rotate left à coluna mais à direita, e
-; guarda o bit que se perde na carry, que vai ser usado como o
-; bit 0 do proximo rotate left que for executado.
-
-; Se no rotate da coluna mais à esquerda se perdeu alguma coisa, 
-; então é para passar para a coluna mais a direita.
-; Se depois do ultimo rotate o carry estiver definido, faz-se um
-; OR ao bit 0 da coluna mais à direita.
-
 ; Loop2
 scroll_esquerda_2
     ld a, (hl)              ; Faz um rotate left aos 8 pixels no
@@ -61,6 +55,15 @@ scroll_esquerda_2
     dec hl                  ; Anda uma coluna para a esquerda
     djnz scroll_esquerda_2  ; Se ainda nao chegou ao fim, repete
 
+    ld a, (aids2)
+    ld d, $0
+    ld e, a
+    ld hl, udg_start
+    add hl, de
+    ld a, (hl)
+    rla
+    ld (hl), a
+    
     ld hl, (ultimoaddr)     ; Le o valor do endereço da coluna 
     ld a, (hl)              ; mais à direita, em A
 

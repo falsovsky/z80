@@ -1,4 +1,4 @@
-text db "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin commodo metus sed orci fermentum, id mattis quam suscipit.", 0
+text db "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin commodo metus sed orci fermentum, id mattis quam suscipit OI VIVA O BENFICA!!", 0
 
 chars       equ $5c36   ; Endereço 256 ($100) bytes abaixo da fonte (2 bytes)
                         ; Contem $3c00 inicialmente
@@ -17,6 +17,13 @@ text_pos    db  0,0
 char_pos    db  0
 
 scroll_text
+    ld a, 22
+    rst $10
+    ld a, 0
+    rst $10
+    ld a, 0
+    rst $10
+
     ; Verificar se o valor de text_pos já foi alguma vez alterado
     ld a, (text_pos)    ; Le o primeiro byte
     cp 0                ; Se for 0 é a primeira vez senão
@@ -61,7 +68,7 @@ scroll_text_loop
     pop hl              ; Tira a posição na string da stack
     inc hl              ; Anda para a frente
     ld a, (hl)          ; Le o proximo valor
-    cp 0                ; Se for 0 estamos no fim da string
+    cp $0               ; Se for 0 estamos no fim da string
     jr z, reset         ; Reset à posição
     jr the_end          ; Continua
 reset
@@ -80,4 +87,4 @@ copia_para_udg_loop
     inc hl              ; Incrementa ambos
     inc de
     djnz copia_para_udg_loop ; b--, se b != 0 salta
-    ret   
+    ret
