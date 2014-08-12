@@ -13,8 +13,8 @@ OP_JMP_FWD  equ "["
 OP_JMP_BCK  equ "]"
 
 ;brainfuck   db  "++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>.", 0
-brainfuck   db  "+++++++++++++++++++++++++++++++++.", 0
-;brainfuck   db  "++++[>++++++++++<-]>++.>+++++++++++++.<<++[>.<-]>>.<<+++[>.<-]>>.<<++++[>.<-]>>.<<+++++[>.<-]>>.", 0
+;brainfuck   db  "+++++++++++++++++++++++++++++++++.", 0
+brainfuck   db  "++++[>++++++++++<-]>++.>+++++++++++++.<<++[>.<-]>>.<<+++[>.<-]>>.<<++++[>.<-]>>.<<+++++[>.<-]>>.", 0
 memory_pos  db  $0,$80
 source_pos  db  $0
 
@@ -125,14 +125,16 @@ F_IN_LOOP
     jr continue
 
 F_JMP_FWD
-    ld d, h
-    ld e, l
+    ld a, (source_pos)
+    ld d, 0
+    ld e, a
     push de
     jr continue
 
 F_JMP_BCK
     pop de
-    ld (memory_pos), hl
+    ld a, e
+    ld (source_pos), a
     jp read_bf
 
 end start
