@@ -1,0 +1,107 @@
+.jsspeccy {
+	font-family: Helvetica, Arial, sans-serif;
+	font-size: 11pt;
+	position: relative;
+	width: 640px;
+}
+.jsspeccy canvas {
+	padding: 0;
+	margin: 0;
+}
+.jsspeccy .toolbar {
+	margin: 0;
+	padding: 8px;
+	overflow: hidden;
+	background-color: #445;
+	list-style-type: none;
+}
+.jsspeccy .toolbar li {
+	float: left;
+	padding-right: 8px;
+}
+
+.jsspeccy .toolbar button {
+	width: 64px;
+	height: 64px;
+	text-indent: -5000px;
+	direction: ltr;
+	background-position: center center;
+	background-repeat: no-repeat;
+}
+
+.jsspeccy .toolbar label {
+	color: white;
+}
+
+
+.jsspeccy .toolbar .stop {
+	background-image: url(images/48x48_player_pause.png);
+}
+.jsspeccy .toolbar .start {
+	background-image: url(images/48x48_player_play.png);
+}
+.jsspeccy .toolbar .reset {
+	background-image: url(images/48x48_kaboodleloop.png);
+}
+.jsspeccy .toolbar .audio {
+	background-image: url(images/48x48_sound_off.png);
+}
+.jsspeccy .toolbar .audio.enabled {
+	background-image: url(images/48x48_sound_on.png);
+}
+.jsspeccy .toolbar .open {
+	background-image: url(images/48x48_folder_blue_open.png);
+}
+.jsspeccy .toolbar .about {
+	background-image: url(images/48x48_messagebox_info.png);
+}
+
+.jsspeccy .panel {
+	top: 30px;
+	left: 50%;
+	margin-left: -300px;
+	padding-left: 10px;
+	padding-right: 10px;
+	width: 580px;
+	height: 400px;
+	background-color: white;
+	color: black;
+	display: none;
+	position: absolute;
+	border: 1px solid #444;
+}
+
+.jsspeccy .panel .close {
+	position: absolute;
+	right: 0px;
+}
+
+.jsspeccy .panel h1, .jsspeccy .panel h2 {
+	margin-top: 0.8em;
+	margin-bottom: 0.8em;
+}
+
+.jsspeccy .panel .note {
+	font-weight: normal;
+	font-style: italic;
+	font-size: 10pt;
+}
+
+.jsspeccy .about {
+	text-align: center;
+}
+
+.jsspeccy .open-file .search-wos input[type=search] {
+	width: 400px;
+}
+
+.jsspeccy .about h1 {
+	font-size: 18pt;
+	margin-bottom: 0;
+}
+.jsspeccy .about h2 {
+	font-size: 12pt;
+}
+.jsspeccy .about .licence {
+	font-size: 9pt;
+}
