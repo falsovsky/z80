@@ -3,14 +3,14 @@ org 30000
 tv_flag     equ $5c3c       ; Variavel das flags da tv
 last_k      equ $5c08       ; Contem a ultima tecla pressionada
 
-OP_INC_DP   equ $3e
-OP_DEC_DP   equ $3c
-OP_INC_VAL  equ $2b
-OP_DEC_VAL  equ $2d
-OP_OUT      equ $2e
-OP_IN       equ $2c
-OP_JMP_FWD  equ $5b
-OP_JMP_BCK  equ $5d
+OP_INC_DP   equ ">"
+OP_DEC_DP   equ "<"
+OP_INC_VAL  equ "+"
+OP_DEC_VAL  equ "-"
+OP_OUT      equ "."
+OP_IN       equ ","
+OP_JMP_FWD  equ "["
+OP_JMP_BCK  equ "]"
 
 ;brainfuck   db  "++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>.", 0
 brainfuck   db  "+++++++++++++++++++++++++++++++++.", 0
