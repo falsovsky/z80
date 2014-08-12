@@ -17,7 +17,8 @@ Instalação
 ```sh
 git clone https://github.com/falsovsky/z80.git
 cd z80/scroller
-pasmo -v --tapbas --err main.asm main.tap
+pasmo -v --tapbas --err main_first.asm main_first.tap
+pasmo -v --tapbas --err main_second.asm main_second.tap
 
 ```
 
