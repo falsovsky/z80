@@ -28,7 +28,7 @@ read_bf
     push hl
 
     ; EOF
-    cp 0
+    cp $0
     jr z, end_main
 
     ; >
@@ -107,5 +107,7 @@ F_IN_LOOP
     ld hl, (memory_pos)
     ld (hl), a
     jr continue
+    
+
 
 end start
