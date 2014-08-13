@@ -12,12 +12,12 @@ OP_IN       equ ","
 OP_JMP_FWD  equ "["
 OP_JMP_BCK  equ "]"
 
-brainfuck   db  "++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>.", 0
+;brainfuck   db  "++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>.", 0
 ;brainfuck   db  "+++++++++++++++++++++++++++++++++.", 0
-;brainfuck   db  "++++[>++++++++++<-]>++.>+++++++++++++.<<++[>.<-]>>.<<+++[>.<-]>>.<<++++[>.<-]>>.<<+++++[>.<-]>>.", 0
+brainfuck   db  "++++[>++++++++++<-]>++.>+++++++++++++.<<++[>.<-]>>.<<+++[>.<-]>>.<<++++[>.<-]>>.<<+++++[>.<-]>>.", 0
 ;brainfuck   db  "++[>+<-]" ,0
 memory_pos  db  $0,$80
-source_pos  db  $0
+source_pos  db  $0,$0
 
 start                       ; Começa em $75a2
     xor a                   ; O mesmo que LD a, 0
@@ -26,9 +26,7 @@ start                       ; Começa em $75a2
 
 main
     ld hl, brainfuck
-    ld a, (source_pos)
-    ld d, $0
-    ld e, a
+    ld de, (source_pos)
 
     add hl, de
     ld a, (hl)
@@ -70,9 +68,9 @@ main
     jr z, F_JMP_BCK
 
 continue
-    ld a, (source_pos)
-    inc a
-    ld (source_pos), a
+    ld de, (source_pos)
+    inc de
+    ld (source_pos), de
     jr main
 
 end_main
@@ -82,17 +80,17 @@ end_main
 ; -------------------------------------
 
 F_INC_DP
-    ld a, (memory_pos)
-    inc a
-    ld (memory_pos), a
+    ld de, (memory_pos)
+    inc de
+    ld (memory_pos), de
     jr continue
 
 ; -------------------------------------
 
 F_DEC_DP
-    ld a, (memory_pos)
-    dec a
-    ld (memory_pos), a
+    ld de, (memory_pos)
+    dec de
+    ld (memory_pos), de
     jr continue
 
 ; -------------------------------------
@@ -142,38 +140,34 @@ F_JMP_FWD
     cp 0
     jr z, SKIP_LOOP
     
-    ld a, (source_pos)
-    ld d, 0
-    ld e, a
+    ld de, (source_pos)
     push de
     jr continue
     
 SKIP_LOOP
-    ld a, (source_pos)
-    inc a
-    ld (source_pos), a
+    ld de, (source_pos)
+    inc de
+    ld (source_pos), de
 
     ld hl, brainfuck
-    ld a, (source_pos)
-    ld d, $0
-    ld e, a
 
     add hl, de
     ld a, (hl)
     cp OP_JMP_BCK
     jr nz, SKIP_LOOP
 
-    ld a, (source_pos)
-    inc a
-    ld (source_pos), a
+    ld de, (source_pos)
+    inc de
+    ld (source_pos), de
     jp main
 
 ; -------------------------------------
 
 F_JMP_BCK
     pop de
-    ld a, e
-    ld (source_pos), a
+    ld (source_pos), de
     jp main
+
+; -------------------------------------
 
 end start
