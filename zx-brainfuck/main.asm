@@ -13,9 +13,7 @@ OP_JMP_FWD  equ "["
 OP_JMP_BCK  equ "]"
 
 ;brainfuck   db  "++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>.", 0
-;brainfuck   db  "+++++++++++++++++++++++++++++++++.", 0
 brainfuck   db  "++++[>++++++++++<-]>++.>+++++++++++++.<<++[>.<-]>>.<<+++[>.<-]>>.<<++++[>.<-]>>.<<+++++[>.<-]>>.", 0
-;brainfuck   db  "++[>+<-]" ,0
 memory_pos  db  $0,$80
 source_pos  db  $0,$0
 
@@ -37,35 +35,35 @@ main
 
     ; >
     cp OP_INC_DP
-    jr z, F_INC_DP
+    jp z, F_INC_DP
 
     ; <
     cp OP_DEC_DP
-    jr z, F_DEC_DP
+    jp z, F_DEC_DP
 
     ; +
     cp OP_INC_VAL
-    jr z, F_INC_VAL
+    jp z, F_INC_VAL
 
     ; -
     cp OP_DEC_VAL
-    jr z, F_DEC_VAL
+    jp z, F_DEC_VAL
 
     ; .
     cp OP_OUT
-    jr z, F_OUT
+    jp z, F_OUT
     
     ; ,
     cp OP_IN
-    jr z, F_IN
+    jp z, F_IN
     
     ; [
     cp OP_JMP_FWD
-    jr z, F_JMP_FWD
+    jp z, F_JMP_FWD
     
     ; ]
     cp OP_JMP_BCK
-    jr z, F_JMP_BCK
+    jp z, F_JMP_BCK
 
 continue
     ld de, (source_pos)
@@ -83,7 +81,7 @@ F_INC_DP
     ld de, (memory_pos)
     inc de
     ld (memory_pos), de
-    jr continue
+    jp continue
 
 ; -------------------------------------
 
@@ -91,7 +89,7 @@ F_DEC_DP
     ld de, (memory_pos)
     dec de
     ld (memory_pos), de
-    jr continue
+    jp continue
 
 ; -------------------------------------
 
@@ -100,7 +98,7 @@ F_INC_VAL
     ld a, (de)
     inc a
     ld (de), a
-    jr continue
+    jp continue
 
 ; -------------------------------------
 
@@ -109,16 +107,23 @@ F_DEC_VAL
     ld a, (de)
     dec a
     ld (de), a
-    jr continue
+    jp continue
 
 ; -------------------------------------
 
 F_OUT
     ld de, (memory_pos)
     ld a, (de)
+    cp $a
+    jr z, F_OUT_NEWLINE
     rst $10
-    jr continue
+    jp continue
 
+; $a is a new line on the PC but not on the Spectrum, use $d instead
+F_OUT_NEWLINE
+    ld a, $d
+    rst $10
+    jp continue
 ; -------------------------------------
 
 F_IN
@@ -130,7 +135,7 @@ F_IN_LOOP
     jr z, F_IN_LOOP         ; tecla, por isso... repete
     ld de, (memory_pos)
     ld (de), a
-    jr continue
+    jp continue
 
 ; -------------------------------------
 
@@ -142,7 +147,7 @@ F_JMP_FWD
     
     ld de, (source_pos)
     push de
-    jr continue
+    jp continue
     
 SKIP_LOOP
     ld de, (source_pos)
