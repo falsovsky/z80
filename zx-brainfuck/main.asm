@@ -12,9 +12,10 @@ OP_IN       equ ","
 OP_JMP_FWD  equ "["
 OP_JMP_BCK  equ "]"
 
-;brainfuck   db  "++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>.", 0
+brainfuck   db  "++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>.", 0
 ;brainfuck   db  "+++++++++++++++++++++++++++++++++.", 0
-brainfuck   db  "++++[>++++++++++<-]>++.>+++++++++++++.<<++[>.<-]>>.<<+++[>.<-]>>.<<++++[>.<-]>>.<<+++++[>.<-]>>.", 0
+;brainfuck   db  "++++[>++++++++++<-]>++.>+++++++++++++.<<++[>.<-]>>.<<+++[>.<-]>>.<<++++[>.<-]>>.<<+++++[>.<-]>>.", 0
+;brainfuck   db  "++[>+<-]" ,0
 memory_pos  db  $0,$80
 source_pos  db  $0
 
@@ -24,8 +25,6 @@ start                       ; Começa em $75a2
     push bc                 ; Guarda BC na stack
 
 main
-    ;ld hl, brainfuck
-read_bf
     ld hl, brainfuck
     ld a, (source_pos)
     ld d, $0
@@ -71,15 +70,16 @@ read_bf
     jr z, F_JMP_BCK
 
 continue
-    inc hl
     ld a, (source_pos)
     inc a
     ld (source_pos), a
-    jr read_bf
+    jr main
 
 end_main
     pop bc                  ; Tira o BC da stack
     ret                     ; Sai para o BASIC
+
+; -------------------------------------
 
 F_INC_DP
     ld a, (memory_pos)
@@ -87,11 +87,15 @@ F_INC_DP
     ld (memory_pos), a
     jr continue
 
+; -------------------------------------
+
 F_DEC_DP
     ld a, (memory_pos)
     dec a
     ld (memory_pos), a
     jr continue
+
+; -------------------------------------
 
 F_INC_VAL
     ld de, (memory_pos)
@@ -100,6 +104,8 @@ F_INC_VAL
     ld (de), a
     jr continue
 
+; -------------------------------------
+
 F_DEC_VAL
     ld de, (memory_pos)
     ld a, (de)
@@ -107,11 +113,15 @@ F_DEC_VAL
     ld (de), a
     jr continue
 
+; -------------------------------------
+
 F_OUT
     ld de, (memory_pos)
     ld a, (de)
     rst $10
     jr continue
+
+; -------------------------------------
 
 F_IN
     ld a, $0
@@ -124,17 +134,46 @@ F_IN_LOOP
     ld (de), a
     jr continue
 
+; -------------------------------------
+
 F_JMP_FWD
+    ld de, (memory_pos)
+    ld a, (de)
+    cp 0
+    jr z, SKIP_LOOP
+    
     ld a, (source_pos)
     ld d, 0
     ld e, a
     push de
     jr continue
+    
+SKIP_LOOP
+    ld a, (source_pos)
+    inc a
+    ld (source_pos), a
+
+    ld hl, brainfuck
+    ld a, (source_pos)
+    ld d, $0
+    ld e, a
+
+    add hl, de
+    ld a, (hl)
+    cp OP_JMP_BCK
+    jr nz, SKIP_LOOP
+
+    ld a, (source_pos)
+    inc a
+    ld (source_pos), a
+    jp main
+
+; -------------------------------------
 
 F_JMP_BCK
     pop de
     ld a, e
     ld (source_pos), a
-    jp read_bf
+    jp main
 
 end start
