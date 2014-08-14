@@ -1,18 +1,37 @@
-org 30000
+; Begin code at $7530
+org $7530
 
-tv_flag     equ $5c3c       ; TV flags variable
-last_k      equ $5c08       ; Last pressed key
+; System variables
+tv_flag     equ $5c3c   ; TV flags variable
+last_k      equ $5c08   ; Last pressed key
 
-; Brainfuck Operators
-OP_INC_DP   equ ">"         ; $3e - 62
-OP_DEC_DP   equ "<"         ; $3c - 60
-OP_INC_VAL  equ "+"         ; $2b - 43
-OP_DEC_VAL  equ "-"         ; $2d - 45
-OP_OUT      equ "."         ; $2e - 46
-OP_IN       equ ","         ; $2c - 44
-OP_JMP_FWD  equ "["         ; $5b - 91
-OP_JMP_BCK  equ "]"         ; $5d - 93
+; Brainfuck opcodes
+OP_INC_DP   equ ">"     ; $3e - 62
+OP_DEC_DP   equ "<"     ; $3c - 60
+OP_INC_VAL  equ "+"     ; $2b - 43
+OP_DEC_VAL  equ "-"     ; $2d - 45
+OP_OUT      equ "."     ; $2e - 46
+OP_IN       equ ","     ; $2c - 44
+OP_JMP_FWD  equ "["     ; $5b - 91
+OP_JMP_BCK  equ "]"     ; $5d - 93
 
+; Current memory position 
+; Initialized with the address of where the BF memory starts - $8000
+memory_pos      db  $0,$80  
+
+; Current source position
+source_pos      db  $0,$0
+
+; Number of branches
+; Used to find the correspondent "]" to the "[" when the current
+; value is $0 and there's "[" inside of a "["... it's hard to explain
+branch_count    db $0
+
+; Lookup Table, with opcodes and corresponding routine addresses
+tbl_opcodes     db  OP_INC_DP, OP_DEC_DP, OP_INC_VAL, OP_DEC_VAL, OP_OUT, OP_IN, OP_JMP_FWD, OP_JMP_BCK
+tbl_routines    dw  F_INC_DP, F_DEC_DP, F_INC_VAL, F_DEC_VAL, F_OUT, F_IN, F_JMP_FWD, F_JMP_BCK
+
+; BF code to execute, end it with 0
 ; Hello World
 ;src   db  "++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>.", 0
 ; Arvorezinha
@@ -21,14 +40,6 @@ OP_JMP_BCK  equ "]"         ; $5d - 93
 ;src   db  "++++++++++>+[,<.>.]", 0
 ; Bad Boy Hello world - crashes most interpreters
 src   db  ">++++++++[<+++++++++>-]<.>>+>+>++>[-]+<[>[->+<<++++>]<<]>.+++++++..+++.>>+++++++.<<<[[-]<[-]>]<+++++++++++++++.>>.+++.------.--------.>>+.>++++.", 0
-
-; Variables
-memory_pos  db  $0,$80      ; Current memory position
-                            ; Contains the address on where the BF memory begins
-source_pos  db  $0,$0       ; Current source position
-branch_count db $0
-lookup_tbl_opcodes  db  OP_INC_DP, OP_DEC_DP, OP_INC_VAL, OP_DEC_VAL, OP_OUT, OP_IN, OP_JMP_FWD, OP_JMP_BCK
-lookup_tbl_routines dw  F_INC_DP, F_DEC_DP, F_INC_VAL, F_DEC_VAL, F_OUT, F_IN, F_JMP_FWD, F_JMP_BCK
 
 
 start
@@ -64,8 +75,8 @@ end_main
 ; opcode comes in A
 lookup_table
     pop de                  ; Remove return address from stack
-    ld de, lookup_tbl_opcodes ; Start of opcodes_tbl in DE
-    ld hl, lookup_tbl_routines ; Start of routines_tbl in HL
+    ld de, tbl_opcodes      ; tbl_opcodes in DE
+    ld hl, tbl_routines     ; tbl_routines in HL
     ld c, $9                ; Number of valid opcodes + 1
 lookup_table_loop
     ld b, a                 ; B = A (opcode to run)
@@ -76,10 +87,10 @@ lookup_table_loop
     jr z, lookup_table_found ; Found it!
     pop bc                  ; Get values from stack
     ld a, b                 ; A = B (opcode to run)
-    inc de                  ; Next item in opcodes_tbl
+    inc de                  ; Next item in tbl_opcodes
     inc hl
-    inc hl                  ; Next item in opcodes_routines              
-    dec c                   ; C = C -1
+    inc hl                  ; Next item in tbl_routines
+    dec c                   ; C = C - 1
     jr z, lookup_table_invalid ; Is it 0? Non valid opcode
     jr lookup_table_loop    ; Repeat
 lookup_table_found
@@ -91,7 +102,7 @@ lookup_table_invalid
     ret                     ; Return to last item in the stack
 lookup_table_ret
     ld e, (hl)              ; Save the address of the routine to
-    inc hl                  ; be RETurned in DE
+    inc hl                  ; be RETurned to in DE
     ld d, (hl)
     push de                 ; Send it to the stack
     ret                     ; Return to last item in the stack
@@ -162,14 +173,14 @@ F_IN_LOOP
 ; -------------------------------------
 
 F_JMP_FWD
-    ld de, (memory_pos)     ; If the value at current memory
+    ld de, (memory_pos)     ; If the value at the current memory
     ld a, (de)              ; position is 0, skip until the next
     cp $0                   ; "]"
     jr z, SKIP_LOOP
     
-    ld de, (source_pos)     ; Save the "[" source position on the
-    push de                 ; stack, and continue to next instruction
-    jp continue
+    ld de, (source_pos)     ; Else...
+    push de                 ; Save the "[" source position on the
+    jp continue             ; stack, and continue to next instruction
 
 ; Increments the source position until a "]" is found
 SKIP_LOOP
@@ -188,8 +199,8 @@ SKIP_LOOP_2
     cp OP_JMP_FWD           ; Is it a "[" ?
     jr z, F_JMP_FWD         ; Do it again
     
-    cp OP_JMP_BCK           ; Is it a "]"?
-    jr nz, SKIP_LOOP_2      ; Repeat until found
+    cp OP_JMP_BCK           ; If its not a "]"
+    jr nz, SKIP_LOOP_2      ; Repeat until one is found
 
     ld a, (branch_count)    ; If the number of branches is not 0
     dec a                   ; we need to find the next "]"
@@ -201,10 +212,10 @@ SKIP_LOOP_2
 ; -------------------------------------
 
 F_JMP_BCK
-    pop de                  ; Set the source_position as the last
+    pop de                  ; Set the source position as the last
     dec de                  ; "[" position saved on the stack 
     ld (source_pos), de     ; minus 1
-    jp continue             ; The continue label increments it
+    jp continue             ; The continue label will increment it
 
 ; -------------------------------------
 
