@@ -46,7 +46,7 @@ main
     cp $0                   ; End of file
     jr z, end_main          ; Jump to the end
 
-    call loopup_table       ; Process opcode
+    call lookup_table       ; Process opcode
 
 continue
     ld de, (source_pos)     ; Increment source position
@@ -62,12 +62,12 @@ end_main
 ; -------------------------------------
 
 ; opcode comes in A
-loopup_table
+lookup_table
     pop de                  ; Remove return address from stack
     ld de, lookup_tbl_opcodes ; Start of opcodes_tbl in DE
     ld hl, lookup_tbl_routines ; Start of routines_tbl in HL
     ld c, $9                ; Number of valid opcodes + 1
-loopup_table_loop
+lookup_table_loop
     ld b, a                 ; B = A (opcode to run)
     push bc                 ; Push BC to the stack
                             ; B = Opcode, C = counter
@@ -80,12 +80,12 @@ loopup_table_loop
     inc hl
     inc hl                  ; Next item in opcodes_routines              
     dec c                   ; C = C -1
-    jr z, lookup_table_default ; Is it 0? Non valid opcode
-    jr loopup_table_loop    ; Repeat
+    jr z, lookup_table_invalid ; Is it 0? Non valid opcode
+    jr lookup_table_loop    ; Repeat
 lookup_table_found
     pop bc
     jr lookup_table_ret
-lookup_table_default
+lookup_table_invalid
     ld de, continue         ; DE = address to "continue" label
     push de                 ; Send it to the stack
     ret                     ; Return to last item in the stack
