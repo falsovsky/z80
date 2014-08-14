@@ -9,13 +9,13 @@ Requirements
 * [Pasmo] - Z80 Assembler, it's Open Source and Cross Platform
 * [ZX Spin] - ZX Spectrum Emulator for Windows... or a real Spectrum
 
-To build
+Build
 --------------
 
 ```sh
 git clone https://github.com/falsovsky/z80.git
 cd z80/zx-brainfuck
-pasmo -v --tapbas --err main.asm main.tap
+pasmo -v --tapbas --err main.asm zx_brainfuck.tap
 ```
 
 Demo

@@ -1,23 +1,23 @@
-Scroller
+Scroller1
 =========
 
-Scroller é uma implementação um scroller de texto em Assembly no ZX Spectrum.
+Scroller1 é a minha primeira implementação um [scroller] em Z80 Assembly para o ZX Spectrum.
+
+Apenas scrolla o que já está actualmente no ecrã, pixel a pixel, da esquerda para a direita e da direita para a esquerda.
 
 Requisitos
 -----------
 
-O unico realmente necessário é o Assembler, mas para ver o resultado convem tambem ter um emulador, os verdadeiros podem converter o ficheiro [tap] para audio, passar para um leitor de mp3 e ligar a um Spectrum real :-D
-
 * [Pasmo] - Assembler de Z80, é Open Source e Cross Platform
-* [ZX Spin] - Emulador de ZX Spectrum para Windows que inclui um Debugger
+* [ZX Spin] - Emulador de ZX Spectrum para Windows que inclui um Debugger, ou um Spectrum de verdade :-)
 
-Instalação
+Assemblar
 --------------
 
 ```sh
 git clone https://github.com/falsovsky/z80.git
 cd z80/scroller1
-pasmo -v --tapbas --err main.asm main.tap
+pasmo -v --tapbas --err main.asm scroller1.tap
 ```
 
 Demo
@@ -29,6 +29,6 @@ Licença
 
 BSD
 
-[tap]:http://www.worldofspectrum.org/faq/reference/formats.htm
+[scroller]:http://en.wikipedia.org/wiki/Scrolling#Demos
 [Pasmo]:http://pasmo.speccy.org/
 [ZX Spin]:http://www.zophar.net/sinclair/zx-spin.html
