@@ -61,38 +61,40 @@ end_main
 
 ; -------------------------------------
 
+; opcode comes in A
 loopup_table
-    pop de
-    ld de, lookup_tbl_opcodes
-    ld hl, lookup_tbl_routines
-    ld c, $9
+    pop de                  ; Remove return address from stack
+    ld de, lookup_tbl_opcodes ; Start of opcodes_tbl in DE
+    ld hl, lookup_tbl_routines ; Start of routines_tbl in HL
+    ld c, $9                ; Number of valid opcodes + 1
 loopup_table_loop
-    ld b, a
-    push bc
-    ld a, (de)
-    cp b
-    jr z, lookup_table_found
-    pop bc
-    ld a, b
-    inc de
+    ld b, a                 ; B = A (opcode to run)
+    push bc                 ; Push BC to the stack
+                            ; B = Opcode, C = counter
+    ld a, (de)              ; Read item from opcodes_tbl
+    cp b                    ; Is it the same?
+    jr z, lookup_table_found ; Found it!
+    pop bc                  ; Get values from stack
+    ld a, b                 ; A = B (opcode to run)
+    inc de                  ; Next item in opcodes_tbl
     inc hl
-    inc hl
-    dec c
-    jr z, lookup_table_default
-    jr loopup_table_loop
+    inc hl                  ; Next item in opcodes_routines              
+    dec c                   ; C = C -1
+    jr z, lookup_table_default ; Is it 0? Non valid opcode
+    jr loopup_table_loop    ; Repeat
 lookup_table_found
     pop bc
     jr lookup_table_ret
 lookup_table_default
-    ld de, continue
-    push de
-    ret
+    ld de, continue         ; DE = address to "continue" label
+    push de                 ; Send it to the stack
+    ret                     ; Return to last item in the stack
 lookup_table_ret
-    ld e, (hl)
-    inc hl
+    ld e, (hl)              ; Save the address of the routine to
+    inc hl                  ; be RETurned in DE
     ld d, (hl)
-    push de
-    ret
+    push de                 ; Send it to the stack
+    ret                     ; Return to last item in the stack
 
 ; -------------------------------------
 
