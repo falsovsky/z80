@@ -21,7 +21,7 @@ Demos
 ------
 
 * [Hello World](http://falsovsky.github.io/z80/bf-hello.html)
-* [Bad Hello World](http://falsovsky.github.io/z80/bf-bad_hello.html) from [esolang](http://esolangs.org/)'s article about [Brainfuck](http://esolangs.org/wiki/Brainfuck)
+* [Bad Hello World](http://falsovsky.github.io/z80/bf-bad_hello.html) from [esolang](http://esolangs.org/) wiki article about [Brainfuck](http://esolangs.org/wiki/Brainfuck)
 * [Arvorezinha](http://falsovsky.github.io/z80/bf-arvorezinha.html)
 * [Arvorezinha with loops](http://falsovsky.github.io/z80/bf-arvorezinha_loops.html)
 * [Input/Output test](http://falsovsky.github.io/z80/bf-io.html)
