@@ -14,20 +14,21 @@ OP_JMP_FWD  equ "["         ; $5b - 91
 OP_JMP_BCK  equ "]"         ; $5d - 93
 
 ; Hello World
-;brainfuck   db  "++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>.", 0
+;src   db  "++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>.", 0
 ; Arvorezinha
-;brainfuck   db  "++++[>++++++++++<-]>++.>+++++++++++++.<<++[>.<-]>>.<<+++[>.<-]>>.<<++++[>.<-]>>.<<+++++[>.<-]>>.", 0
+;src   db  "++++[>++++++++++<-]>++.>+++++++++++++.<<++[>.<-]>>.<<+++[>.<-]>>.<<++++[>.<-]>>.<<+++++[>.<-]>>.", 0
 ; To test the "," operator
-;brainfuck   db  "++++++++++>+[,<.>.]", 0    
-; Bad Boy Hello world
-brainfuck   db  ">++++++++[<+++++++++>-]<.>>+>+>++>[-]+<[>[->+<<++++>]<<]>.+++++++..+++.>>+++++++.<<<[[-]<[-]>]<+++++++++++++++.>>.+++.------.--------.>>+.>++++.", 0
+;src   db  "++++++++++>+[,<.>.]", 0
+; Bad Boy Hello world - crashes most interpreters
+src   db  ">++++++++[<+++++++++>-]<.>>+>+>++>[-]+<[>[->+<<++++>]<<]>.+++++++..+++.>>+++++++.<<<[[-]<[-]>]<+++++++++++++++.>>.+++.------.--------.>>+.>++++.", 0
 
 ; Variables
 memory_pos  db  $0,$80      ; Current memory position
                             ; Contains the address on where the BF memory begins
 source_pos  db  $0,$0       ; Current source position
 branch_count db $0
-;lookup_tbl  db  F_INC_DP,F_INC_DP+1, F_DEC_DP, F_DEC_DP+1
+lookup_tbl_opcodes  db  OP_INC_DP, OP_DEC_DP, OP_INC_VAL, OP_DEC_VAL, OP_OUT, OP_IN, OP_JMP_FWD, OP_JMP_BCK
+lookup_tbl_routines dw  F_INC_DP, F_DEC_DP, F_INC_VAL, F_DEC_VAL, F_OUT, F_IN, F_JMP_FWD, F_JMP_BCK
 
 
 start
@@ -36,58 +37,62 @@ start
     push bc                 ; Save BC on the stack
 
 main
-    ld hl, brainfuck        ; Get source first position
+    ld hl, src              ; Get source first position
     ld de, (source_pos)     ; 
     add hl, de              ; First position + current position
 
     ld a, (hl)              ; Read opcode from source
 
-    ; EOF
     cp $0                   ; End of file
     jr z, end_main          ; Jump to the end
 
-    ; >
-    cp OP_INC_DP
-    jp z, F_INC_DP
-
-    ; <
-    cp OP_DEC_DP
-    jp z, F_DEC_DP
-
-    ; +
-    cp OP_INC_VAL
-    jp z, F_INC_VAL
-
-    ; -
-    cp OP_DEC_VAL
-    jp z, F_DEC_VAL
-
-    ; .
-    cp OP_OUT
-    jp z, F_OUT
-    
-    ; ,
-    cp OP_IN
-    jp z, F_IN
-    
-    ; [
-    cp OP_JMP_FWD
-    jp z, F_JMP_FWD
-    
-    ; ]
-    cp OP_JMP_BCK
-    jp z, F_JMP_BCK
+    call loopup_table       ; Process opcode
 
 continue
     ld de, (source_pos)     ; Increment source position
     inc de
     ld (source_pos), de
-   
+
     jr main                 ; Do it again
 
 end_main
     pop bc                  ; Get BC out of the stack
     ret                     ; Exit to BASIC
+
+; -------------------------------------
+
+loopup_table
+    pop de
+    ld de, lookup_tbl_opcodes
+    ld hl, lookup_tbl_routines
+    ld c, $9
+loopup_table_loop
+    ld b, a
+    push bc
+    ld a, (de)
+    cp b
+    jr z, lookup_table_found
+    pop bc
+    ld a, b
+    inc de
+    inc hl
+    inc hl
+    dec c
+    jr z, lookup_table_default
+    jr loopup_table_loop
+lookup_table_found
+    pop bc
+    jr lookup_table_ret
+lookup_table_default
+    ld de, continue
+    push de
+    ret
+lookup_table_ret
+    ld e, (hl)
+    inc hl
+    ld d, (hl)
+    push de
+    ret
 
 ; -------------------------------------
 
@@ -174,7 +179,7 @@ SKIP_LOOP_2
     inc de
     ld (source_pos), de
 
-    ld hl, brainfuck        ; String first position
+    ld hl, src              ; String first position
     add hl, de              ; First position + current position
     ld a, (hl)              ; Read opcode from source
 
