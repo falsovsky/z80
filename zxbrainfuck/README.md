@@ -3,6 +3,16 @@ zxBrainfuck
 
 zxBrainfuck is a [Brainfuck] interpreter in Z80 assembly for the ZX Spectrum.
 
+* Supports all the Brainfuck instructions.
+* User defined Brainfuck memory size in the **memory_size** variable. The default is 5000.
+* The memory wraps at the beginning and end.
+* Clears all the memory cells before use.
+* Correctly counts the number of **]** equivalent to **[**, for example, it does not run the **.** in this code:
+```
+[[].]
+```
+* Uses a nice lookup table to run the instruction.
+
 Requirements
 -----------
 
