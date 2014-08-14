@@ -196,16 +196,15 @@ SKIP_LOOP_2
     ld (branch_count), a
     cp $0
     jr nz, SKIP_LOOP_2
-
     jp continue
 
 ; -------------------------------------
 
 F_JMP_BCK
     pop de                  ; Set the source_position as the last
-    ld (source_pos), de     ; "[" position saved on the stack
-    jp main                 ; Jump to main so that it doesn't increment
-                            ; the source_position
+    dec de                  ; "[" position saved on the stack 
+    ld (source_pos), de     ; minus 1
+    jp continue             ; The continue label increments it
 
 ; -------------------------------------
 
