@@ -1,17 +1,15 @@
 zx-brainfuck
 =========
 
-ZX-Brainfuck é um interpretador de [Brainfuck] em Assembly no ZX Spectrum.
+ZX-Brainfuck is a [Brainfuck] interpreter in Z80 assembly for the ZX Spectrum.
 
-Requisitos
+Requirements
 -----------
 
-O unico realmente necessário é o Assembler, mas para ver o resultado convem tambem ter um emulador, os verdadeiros podem converter o ficheiro [tap] para audio, passar para um leitor de mp3 e ligar a um Spectrum real :-D
+* [Pasmo] - Z80 Assembler, it's Open Source and Cross Platform
+* [ZX Spin] - ZX Spectrum Emulator for Windows... or a real Spectrum
 
-* [Pasmo] - Assembler de Z80, é Open Source e Cross Platform
-* [ZX Spin] - Emulador de ZX Spectrum para Windows que inclui um Debugger
-
-Instalação
+To build
 --------------
 
 ```sh
@@ -24,7 +22,7 @@ Demo
 ------
 http://falsovsky.github.io/z80/zx-brainfuck.html
 
-Licença
+License
 ----
 
 BSD
