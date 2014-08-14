@@ -4,6 +4,7 @@ org $7530
 ; System variables
 tv_flag     equ $5c3c   ; TV flags variable
 last_k      equ $5c08   ; Last pressed key
+clear_screen equ $0daf  ; Rom routine to clear the screen
 
 ; Brainfuck opcodes
 OP_INC_DP   equ ">"     ; $3e - 62
@@ -56,6 +57,8 @@ start
     xor a                   ; a = 0
     ld (tv_flag), a         ; Enables rst $10 output to the TV
     push bc                 ; Save BC on the stack
+
+    call clear_screen
 
     call clear_memory       ; Set all memory cells to 0
 
