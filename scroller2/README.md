@@ -9,7 +9,6 @@ Requisitos
 -----------
 
 * [Pasmo] - Assembler de Z80, é Open Source e Cross Platform
-* [ZX Spin] - Emulador de ZX Spectrum para Windows que inclui um Debugger, ou um Spectrum de verdade :-)
 
 Assemblar
 --------------
@@ -31,5 +30,4 @@ BSD
 
 [scroller]:http://en.wikipedia.org/wiki/Scrolling#Demos
 [Pasmo]:http://pasmo.speccy.org/
-[ZX Spin]:http://www.zophar.net/sinclair/zx-spin.html
 [demoscene]:http://en.wikipedia.org/wiki/Demoscene
