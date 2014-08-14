@@ -1,7 +1,7 @@
-zx-brainfuck
+zxBrainfuck
 =========
 
-ZX-Brainfuck is a [Brainfuck] interpreter in Z80 assembly for the ZX Spectrum.
+zxBrainfuck is a [Brainfuck] interpreter in Z80 assembly for the ZX Spectrum.
 
 Requirements
 -----------
@@ -13,8 +13,8 @@ Build
 
 ```sh
 git clone https://github.com/falsovsky/z80.git
-cd z80/zx-brainfuck
-pasmo -v --tapbas --err main.asm zx_brainfuck.tap
+cd z80/zxbrainfuck
+pasmo -v --tapbas --err main.asm zxbrainfuck.tap
 ```
 
 Demo
