@@ -57,6 +57,8 @@ start
     ld (tv_flag), a         ; Enables rst $10 output to the TV
     push bc                 ; Save BC on the stack
 
+    call clear_memory       ; Set all memory cells to 0
+
     ld hl, memory_start
     ld (memory_pos), hl
 main
@@ -81,6 +83,46 @@ continue
 end_main
     pop bc                  ; Get BC out of the stack
     ret                     ; Exit to BASIC
+
+; -------------------------------------
+
+clear_memory
+    ld bc, memory_size
+clear_memory_loop
+    ld hl, memory_start
+    add hl, bc
+    ld a, 0
+    ld (hl), a
+
+    dec bc
+    ld de, memory_start-$1
+    call compare16
+    cp 0
+    jr z, clear_memory_loop
+    ret
+
+; -------------------------------------
+
+; Compare 16bits
+; First argument in HL and second in DE
+; Returns in A - 0 not equal, 0 equal
+compare16
+    ld a, h
+    cp d
+    jr z, compare16_equal1
+    jr compare_not_equal
+compare16_equal1
+    ld a, l
+    cp e
+    jr z, compare16_equal2
+    jr compare_not_equal
+compare16_equal2
+    ld a, 1
+    jr compare_return
+compare_not_equal
+    ld a, 0
+compare_return
+    ret
 
 ; -------------------------------------
 
@@ -126,18 +168,12 @@ F_INC_DP
     inc de
     ld (memory_pos), de
 
-    ld hl, memory_end+1     ; Are we at the end of the memory?
-
-    ld a, h                 ; Compare first byte
-    cp d
-    jr z, F_INC_DP_EQUAL1   ; Its equal ? Let compare the next one
+    ld hl, memory_end+$1    ; Are we at the end of the memory?
+    call compare16
+    cp 1
+    jr z, F_INC_DP_WRAP
     jp continue
-F_INC_DP_EQUAL1
-    ld a, l                 ; Compare second byte
-    cp d
-    jr z, F_INC_DP_EQUAL2   ; Its equal ? Wrap the memory position
-    jp continue
-F_INC_DP_EQUAL2
+F_INC_DP_WRAP
     ld de, memory_start     ; Set memory postion to the first cell
     ld (memory_pos), de
     jp continue
@@ -149,18 +185,12 @@ F_DEC_DP
     dec de
     ld (memory_pos), de
 
-    ld hl, memory_start-1   ; Are we at start of the memory?
-
-    ld a, h                 ; Compare first byte
-    cp d
-    jr z, F_DEC_DP_EQUAL1   ; Its equal ? Let compare the next one
+    ld hl, memory_start-$1  ; Are we at start of the memory?
+    call compare16
+    cp 1
+    jr z, F_DEC_DP_WRAP
     jp continue
-F_DEC_DP_EQUAL1
-    ld a, l                 ; Compare second byte
-    cp d
-    jr z, F_DEC_DP_EQUAL2   ; Its equal ? Wrap the memory position
-    jp continue
-F_DEC_DP_EQUAL2
+F_DEC_DP_WRAP
     ld de, memory_end       ; Set memory postion to the last cell
     ld (memory_pos), de
     jp continue
