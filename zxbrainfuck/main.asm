@@ -15,9 +15,13 @@ OP_IN       equ ","     ; $2c - 44
 OP_JMP_FWD  equ "["     ; $5b - 91
 OP_JMP_BCK  equ "]"     ; $5d - 93
 
+; Brainfuck memory definitions
+memory_size     equ $1388   ; 5000 cells
+memory_start    equ $8000
+memory_end      equ memory_start + memory_size
+
 ; Current memory position 
-; Initialized with the address of where the BF memory starts - $8000
-memory_pos      db  $0,$80  
+memory_pos      db  $0,$0  
 
 ; Current source position
 source_pos      db  $0,$0
@@ -40,7 +44,7 @@ src db "++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<++++
 ;src db "++++++++++>++++++[>+++++++<-]>>++++++[>+>+<<-]>>[<<+>>-]+[>+>+<<-]>>[<<+>>-]<[<<->>-]<[>+>+<<-]>>[<<+>>-]<<<[>>[<<<<.>>>>-]<<<<<<.>>>>>><+[>+>+<<-]>>[<<+>>-]<[-]<<[-]<[>+>>+<<<-]>>>[<<<+>>>-]<[>+>+<<-]>>[<<<->>>-]<[>+<-]>[<+<+>>-]<<<]", 0
 ; To test the "," operator
 ;src db "++++++++++>+[,<.>.]", 0
-; Bad Hello World!
+; Bad Hello World! - often triggers interpreter bugs
 ;src db ">++++++++[<+++++++++>-]<.>>+>+>++>[-]+<[>[->+<<++++>]<<]>.+++++++..+++.>>+++++++.<<<[[-]<[-]>]<+++++++++++++++.>>.+++.------.--------.>>+.>++++.", 0
 ; Number Warper
 ;src db ">>>>+>+++>+++>>>>>+++[>,+>++++[>++++<-]>[<<[-[->]]>[<]>-]<<[>+>+>>+>+[<<<<]<+>>[+<]<[>]>+[[>>>]>>+[<<<<]>-]+<+>>>-[<<+[>]>>+<<<+<+<--------[<<-<<+[>]>+<<-<<-[<<<+<-[>>]<-<-<<<-<----[<<<->>>>+<-[<<<+[>]>+<<+<-<-[<<+<-<+[>>]<+<<<<+<-[<<-[>]>>-<<<-<-<-[<<<+<-[>>]<+<<<+<+<-[<<<<+[>]<-<<-[<<+[>]>>-<<<<-<-[>>>>>+<-<<<+<-[>>+<<-[<<-<-[>]>+<<-<-<-[<<+<+[>]<+<+<-[>>-<-<-[<<-[>]<+<++++[<-------->-]++<[<<+[>]>>-<-<<<<-[<<-<<->>>>-[<<<<+[>]>+<<<<-[<<+<<-[>>]<+<<<<<-[>>>>-<<<-<-]]]]]]]]]]]]]]]]]]]]]]>[>[[[<<<<]>+>>[>>>>>]<-]<]>>>+>>>>>>>+>]<]<[-]<<<<<<<++<+++<+++[[>]>>>>>>++++++++[<<++++>++++++>-]<-<<[-[<+>>.<-]]<<<<[-[-[>+<-]>]>>>>>[.[>]]<<[<+>-]>>>[<<++[<+>--]>>-]<<[->+<[<++>-]]<<<[<+>-]<<<<]>>+>>>--[<+>---]<.>>[[-]<<]<][-.,...]", 0
@@ -53,6 +57,8 @@ start
     ld (tv_flag), a         ; Enables rst $10 output to the TV
     push bc                 ; Save BC on the stack
 
+    ld hl, memory_start
+    ld (memory_pos), hl
 main
     ld hl, src              ; Get source first position
     ld de, (source_pos)     ; 
@@ -119,6 +125,21 @@ F_INC_DP
     ld de, (memory_pos)     ; Increment memory position
     inc de
     ld (memory_pos), de
+
+    ld hl, memory_end+1     ; Are we at the end of the memory?
+
+    ld a, h                 ; Compare first byte
+    cp d
+    jr z, F_INC_DP_EQUAL1   ; Its equal ? Let compare the next one
+    jp continue
+F_INC_DP_EQUAL1
+    ld a, l                 ; Compare second byte
+    cp d
+    jr z, F_INC_DP_EQUAL2   ; Its equal ? Wrap the memory position
+    jp continue
+F_INC_DP_EQUAL2
+    ld de, memory_start     ; Set memory postion to the first cell
+    ld (memory_pos), de
     jp continue
 
 ; -------------------------------------
@@ -126,6 +147,21 @@ F_INC_DP
 F_DEC_DP
     ld de, (memory_pos)     ; Decrement memory position
     dec de
+    ld (memory_pos), de
+
+    ld hl, memory_start-1   ; Are we at start of the memory?
+
+    ld a, h                 ; Compare first byte
+    cp d
+    jr z, F_DEC_DP_EQUAL1   ; Its equal ? Let compare the next one
+    jp continue
+F_DEC_DP_EQUAL1
+    ld a, l                 ; Compare second byte
+    cp d
+    jr z, F_DEC_DP_EQUAL2   ; Its equal ? Wrap the memory position
+    jp continue
+F_DEC_DP_EQUAL2
+    ld de, memory_end       ; Set memory postion to the last cell
     ld (memory_pos), de
     jp continue
 
