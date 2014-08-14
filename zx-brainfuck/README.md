@@ -22,6 +22,8 @@ Demo
 ------
 http://falsovsky.github.io/z80/zx-brainfuck.html
 
+Running the [Fibonacci program] by [Daniel B Cristofani].
+
 License
 ----
 
@@ -31,3 +33,5 @@ BSD
 [tap]:http://www.worldofspectrum.org/faq/reference/formats.htm
 [Pasmo]:http://pasmo.speccy.org/
 [ZX Spin]:http://www.zophar.net/sinclair/zx-spin.html
+[Fibonacci program]:http://www.hevanet.com/cristofd/brainfuck/fib.b
+[Daniel B Cristofani]:http://www.hevanet.com/cristofd/brainfuck/
