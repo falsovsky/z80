@@ -13,7 +13,10 @@ brainfuck.tap: brainfuck.asm
 		pasmo.exe -v --tap --err brainfuck.asm brainfuck.tap
 
 brainfuck:
-		python bf2data.py source.bf > brainfuck.asm
-		
+		python bf2data.py ${SOURCE} > brainfuck.asm
+
 clean:
 		rm -rf *.tap
+
+clean-all: clean
+		rm -rf brainfuck.asm
