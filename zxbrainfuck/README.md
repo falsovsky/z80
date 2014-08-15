@@ -1,7 +1,7 @@
 zxBrainfuck
 =========
 
-zxBrainfuck is a [Brainfuck] interpreter in Z80 assembly for the ZX Spectrum.
+zxBrainfuck is a [Brainfuck](http://en.wikipedia.org/wiki/Brainfuck) interpreter in Z80 assembly for the ZX Spectrum.
 
 * Supports all the Brainfuck instructions.
 * User defined Brainfuck memory size in the **memory_size** variable. The default is 5000.
@@ -16,8 +16,8 @@ zxBrainfuck is a [Brainfuck] interpreter in Z80 assembly for the ZX Spectrum.
 Requirements
 -----------
 
-* [Pasmo] - Z80 Assembler, it's Open Source and Cross Platform
-* [bas2tap] - Convert Spectrum Basic to a TAP
+* [Pasmo](http://pasmo.speccy.org/) - Z80 Assembler, it's Open Source and Cross Platform
+* [bas2tap](ftp://ftp.worldofspectrum.org/pub/sinclair/tools/generic/bas2tap26-generic.zip) - Convert Spectrum Basic to TAP
 
 Build
 --------------
@@ -25,7 +25,14 @@ Build
 ```sh
 git clone https://github.com/falsovsky/z80.git
 cd z80/zxbrainfuck
+```
+
+To convert a brainfuck source file to Spectrum DATA
+```sh
 make brainfuck SOURCE="helloworld.bf"
+```
+And finally
+```sh
 make
 ```
 
@@ -45,6 +52,4 @@ License
 
 BSD
 
-[Brainfuck]:http://en.wikipedia.org/wiki/Brainfuck
-[Pasmo]:http://pasmo.speccy.org/
 [Daniel B Cristofani]:http://www.hevanet.com/cristofd/brainfuck/
