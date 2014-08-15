@@ -17,6 +17,7 @@ Requirements
 -----------
 
 * [Pasmo] - Z80 Assembler, it's Open Source and Cross Platform
+* [bas2tap] - Convert Spectrum Basic to a TAP
 
 Build
 --------------
@@ -24,7 +25,8 @@ Build
 ```sh
 git clone https://github.com/falsovsky/z80.git
 cd z80/zxbrainfuck
-pasmo -v --tapbas --err main.asm zxbrainfuck.tap
+make brainfuck SOURCE="helloworld.bf"
+make
 ```
 
 Demos
