@@ -13,7 +13,11 @@ brainfuck.tap: brainfuck.asm
 		pasmo.exe -v --tap --err brainfuck.asm brainfuck.tap
 
 brainfuck:
+ifeq (${SOURCE},)
+		@echo "Error: Please run with \"make brainfuck SOURCE=soucefile.bf\""
+else
 		python bf2data.py ${SOURCE} > brainfuck.asm
+endif
 
 clean:
 		rm -rf *.tap
