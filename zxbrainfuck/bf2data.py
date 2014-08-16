@@ -9,13 +9,14 @@ if len(sys.argv) < 2:
 
 allowed_chars = (">", "<", "+", "-", ".", ",", "[", "]")
 
-file = open(sys.argv[1], 'r')
+f = open(sys.argv[1], 'r')
 print "ORG $9400"
 sys.stdout.write("src db \"")
-for char in file.read():
+for char in f.read():
     if char in allowed_chars:
         sys.stdout.write(char)
     else:
         continue
 print "\", 0"
+f.close()
 
