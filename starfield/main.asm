@@ -19,7 +19,7 @@ LINHA11     EQU $4860
 ; Color - 1 Byte
 STAR_SIZE   EQU $4
 MAX_STARS   EQU 10
-STARS       DS STAR_SIZE * MAX_STARS, 0
+;STARS       DS STAR_SIZE * MAX_STARS, 0
 
 INCLUDE "starrnd.asm"
 
@@ -29,46 +29,27 @@ start
     push bc
 
     call clear_screen
-    ;call INITIALIZE_STARS
-    ld c, 32
-main
-    ld de, frames
-    ld a, (de)
-    ld d, 0
-    ld e, a
-    ld hl, LINHA9
-    add hl, de
-    ld a, (hl)
-    set 0,a
-    ld (hl), a
 
-    halt
-    
+    ld de, StarRnd
+    ld c, MAX_STARS
+main
+    push bc
+    ld a, (de)
+    ld c, a
+    inc de
+    ld a, (de)
+    ld b, a
+    call Get_Pixel_Address
+    ld a, (hl)
+    set 0, a
+    ld (hl), a
+    pop bc
+    inc de
     dec c
     jr nz, main
     
     pop bc
     ret
-
-PROC
-INITIALIZE_STARS
-    push bc
-    ld b, MAX_STARS
-    ld hl, STARS
-INITIALIZE_STARS_LOOP
-    ld a, 10
-    ld (hl),a
-    inc hl
-    ld a, 15
-    ld (hl),a
-    inc hl
-    ld a, 1
-    ld (hl),a
-    inc hl
-    djnz INITIALIZE_STARS_LOOP
-    pop bc
-    ret
-ENDP
 
 PROC
 ; Get screen address

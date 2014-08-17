@@ -10,12 +10,13 @@ NumStars = 10
 
 f = open('starrnd.asm', 'w')
 
-f.write("StarRnd db %i\n" % (3 * NumStars))
+f.write("StarRnd\n")
 
 for x in range(NumStars):
-    x = random.randint(0,256)
-    y = random.randint(0,192)
-    z = random.randint(0,10)
-    f.write("db %i, %i, %i\n" % (x ,y ,z))
+    x = random.randint(0,256 - 1)
+    y = random.randint(0,192 - 1)
+    #z = random.randint(0,10)
+    #f.write("\t\tdb %i, %i, %i\n" % (x ,y ,z))
+    f.write("\t\tdb %i, %i\n" % (y ,x))
 
 f.close()
