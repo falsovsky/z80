@@ -12,11 +12,11 @@ LINHA10 equ $4840
 LINHA11 equ $4860   
 
 ; Star Structure
-; X - 2 Bytes
+; X - 1 Byte
 ; Y - 1 Byte
 ; Z - 1 Byte
 ; Color - 1 Byte
-STAR_SIZE   equ $5
+STAR_SIZE   equ $4
 MAX_STARS   equ 10
 STARS       ds STAR_SIZE * MAX_STARS, 0
 
@@ -29,9 +29,9 @@ start
     call clear_screen
     ;call INITIALIZE_STARS
 
-    ld hl, LINHA9
+    ld hl, LINHA9+$FF
     ld a, (hl)
-    set 7,a
+    set 0,a
     ld (hl), a
 
     pop bc                  ; Get BC out of the stack
@@ -46,9 +46,6 @@ INITIALIZE_STARS_LOOP
     ld (hl),a
     inc hl
     ld a, 15
-    ld (hl),a
-    inc hl
-    ld a, 5
     ld (hl),a
     inc hl
     ld a, 1
