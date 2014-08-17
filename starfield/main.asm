@@ -5,12 +5,6 @@ org $7530
 tv_flag     EQU $5c3c   ; TV flags
 last_k      EQU $5c08   ; Last pressed key
 clr_screen  EQU $0daf   ; ROM routine to clear the screen
-frames      EQU $5c78
-
-; Video RAM
-LINHA9      EQU $4820
-LINHA10     EQU $4840
-LINHA11     EQU $4860   
 
 ; Star Structure
 ; X - 1 Byte - $00 - $ff
@@ -19,7 +13,6 @@ LINHA11     EQU $4860
 ; Color - 1 Byte
 STAR_SIZE   EQU $4
 MAX_STARS   EQU 10
-;STARS       DS STAR_SIZE * MAX_STARS, 0
 
 INCLUDE "starrnd.asm"
 
@@ -30,21 +23,21 @@ start
 
     call clear_screen
 
-    ld de, StarRnd
+    ld hl, StarRnd
     ld c, MAX_STARS
 main
     push bc
-    ld a, (de)
-    ld c, a
-    inc de
-    ld a, (de)
-    ld b, a
-    call Get_Pixel_Address
     ld a, (hl)
+    ld d, a
+    inc hl
+    ld a, (hl)
+    ld e, a
+    call calculate_screen_address
+    ld a, (de)
     set 0, a
-    ld (hl), a
+    ld (de), a
     pop bc
-    inc de
+    inc hl
     dec c
     jr nz, main
     
@@ -52,34 +45,51 @@ main
     ret
 
 PROC
-; Get screen address
-; B = Y pixel position
-; C = X pixel position
-; Returns address in HL
-Get_Pixel_Address
-    ld a,b          ; Calculate Y2,Y1,Y0
-    and %00000111   ; Mask out unwanted bits
-    or %01000000    ; Set base address of screen
-    ld h, a         ; Store in H
-    ld a, b         ; Calculate Y7,Y6
-    rra             ; Shift to position
-    rra
-    rra
-    and %00011000   ; Mask out unwanted bits
-    or h            ; OR with Y2,Y1,Y0
-    ld h, a         ; Store in H
-    ld a, b         ; Calculate Y5,Y4,Y3
-    rla             ; Shift to position
+;Input:
+; D = Y Coordinate
+; E = X Coordinate
+;
+;Output:
+; DE = Screen Address
+;
+calculate_screen_address
+    ld a,d
     rla
-    and %11100000   ; Mask out unwanted bits
-    ld l, a         ; Store in L
-    ld a, c         ; Calculate X4,X3,X2,X1,X0
-    rra             ; Shift into position
+    rla
+    and 224
+    or e
+    ld e,a
+    ld a,d
     rra
     rra
-    and %00011111   ; Mask out unwanted bits
-    or l            ; OR with Y5,Y4,Y3
-    ld l, a         ; Store in L
+    or 128
+    rra
+    xor d
+    and 248
+    xor d
+    ld d,a
+    ret
+ENDP
+
+PROC
+;Input:
+; DE = Current screen address
+;
+;Output:
+; DE = (Y + 1) screen address
+;
+increment_y
+    inc d
+    ld a,d
+    and 7
+    ret nz
+    ld a,e
+    add a,32
+    ld e,a
+    ret c
+    ld a,d
+    sub 8
+    ld d,a
     ret
 ENDP
 
