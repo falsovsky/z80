@@ -21,6 +21,8 @@ STAR_SIZE   EQU $4
 MAX_STARS   EQU 10
 STARS       DS STAR_SIZE * MAX_STARS, 0
 
+INCLUDE "starrnd.asm"
+
 start
     xor a
     ld (tv_flag), a
