@@ -6,6 +6,11 @@ tv_flag     equ $5c3c   ; TV flags
 last_k      equ $5c08   ; Last pressed key
 clr_screen  equ $0daf   ; ROM routine to clear the screen
 
+; Video RAM
+LINHA9  equ $4820
+LINHA10 equ $4840
+LINHA11 equ $4860   
+
 ; Star Structure
 ; X - 2 Bytes
 ; Y - 1 Byte
@@ -21,8 +26,14 @@ start
     ld (tv_flag), a         ; Enables rst $10 output to the TV
     push bc                 ; Save BC on the stack
 
-    call INITIALIZE_STARS
-    
+    call clear_screen
+    ;call INITIALIZE_STARS
+
+    ld hl, LINHA9
+    ld a, (hl)
+    set 7,a
+    ld (hl), a
+
     pop bc                  ; Get BC out of the stack
     ret                     ; Exit to BASIC
 
@@ -46,5 +57,7 @@ INITIALIZE_STARS_LOOP
     djnz INITIALIZE_STARS_LOOP
     pop bc
     ret
+
+INCLUDE "clear.asm"
 
 end start
