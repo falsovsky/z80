@@ -7,10 +7,12 @@ last_k      EQU $5c08   ; Last pressed key
 clr_screen  EQU $0daf   ; ROM routine to clear the screen
 
 ; Star Structure
-; X - 1 Byte - $00 - $ff
-; Y - 1 Byte - $00 - $bf
+; X - 1 Byte        $00 - $20
+; Xbit - 1 Byte     $7 - $0
+; Y - 1 Byte        $00 - $bf
+; ----------
 ; Z - 1 Byte
-; Color - 1 Byte
+; ZLoop - 1Byte
 STAR_SIZE   EQU $4
 MAX_STARS   EQU 10
 
@@ -26,17 +28,23 @@ start
     ld hl, StarRnd
     ld c, MAX_STARS
 main
-    push bc
-    ld a, (hl)
-    ld d, a
-    inc hl
     ld a, (hl)
     ld e, a
-    call calculate_screen_address
-    ld a, (de)
-    set 0, a
-    ld (de), a
-    pop bc
+    inc hl
+    
+    ld a, (hl)
+    ld d, a
+    
+    push hl
+    
+    call get_screen_address
+    ld b, a
+    ld a, (hl)
+    ;set b, a
+    or b
+    ld (hl), a
+    
+    pop hl
     inc hl
     dec c
     jr nz, main
@@ -45,29 +53,37 @@ main
     ret
 
 PROC
-;Input:
-; D = Y Coordinate
-; E = X Coordinate
-;
-;Output:
-; DE = Screen Address
-;
-calculate_screen_address
-    ld a,d
-    rla
-    rla
-    and 224
-    or e
-    ld e,a
-    ld a,d
-    rra
-    rra
-    or 128
-    rra
-    xor d
-    and 248
-    xor d
-    ld d,a
+; Calculate the high byte of the screen addressand store in H reg.
+; On Entry: D reg = X coord,  E reg = Y coord
+; On Exit: HL = screen address, A = pixel postion
+get_screen_address
+	ld a,e
+	and %00000111
+	ld h,a
+	ld a,e
+	rra
+	rra
+	rra
+	and %00011000
+	or h
+	or %01000000
+	ld h,a
+; Calculate the low byte of the screen address and store in L reg.
+	ld a,d
+	rra
+	rra
+	rra
+	and %00011111
+	ld l,a
+	ld a,e
+	rla
+	rla
+	and %11100000
+	or l
+	ld l,a
+; Calculate pixel postion and store in A reg.
+	ld a,d
+	and %00000111
     ret
 ENDP
 
