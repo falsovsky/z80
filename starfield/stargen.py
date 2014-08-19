@@ -15,8 +15,8 @@ f.write("StarRnd\n")
 for x in range(NumStars):
     x = random.randint(0,256 - 1)
     y = random.randint(0,192 - 1)
-    #z = random.randint(0,10)
-    #f.write("\t\tdb %i, %i, %i\n" % (y ,x ,z))
-    f.write("\t\tdb %i, %i\n" % (x ,y))
+    z = random.randint(0,10)
+    #f.write("\t\tdb %i, %i, %i\n" % (x, y, z))
+    f.write("\t\tdb %i, %i\n" % (x, y))
 
 f.close()

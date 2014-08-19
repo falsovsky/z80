@@ -41,6 +41,7 @@ main
     call get_screen_address
     ; Video RAM address for those X,Y is now in HL and the bit needed
     ; to be set in that address value is in A
+    ld d, $1
     call write_pixel    ; Uses those values and writes the pixel
 
     pop hl
@@ -96,9 +97,18 @@ write_pixel_loop
     dec b
     jr write_pixel_loop
 write_pixel_do_it
+    ld a, d
+    cp $1
+    jr z, write_pixel_set
+    ld a, (hl)
+    xor c
+    ld (hl), a
+    jr write_pixel_end
+write_pixel_set
     ld a, (hl)
     or c
     ld (hl), a
+write_pixel_end
     pop bc
     ret
 ENDP    
