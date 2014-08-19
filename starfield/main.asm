@@ -6,9 +6,11 @@ tv_flag     EQU $5c3c   ; TV flags
 last_k      EQU $5c08   ; Last pressed key
 clr_screen  EQU $0daf   ; ROM routine to clear the screen
 
+; Screen is 256x192
+
 ; Star Structure
-; X - 1 Byte        $00 - $20
-; Y - 1 Byte        $00 - $bf
+; X - 1 Byte    $00 - $ff
+; Y - 1 Byte    $00 - $c0
 ; ----------
 ; Z - 1 Byte
 STAR_SIZE   EQU $4
@@ -44,8 +46,8 @@ main
     dec c
     jr nz, main
 
-    ;call increment_x
-    ;jr main_start
+    call increment_x
+    jr main_start
     
     pop bc
     ret
@@ -59,9 +61,9 @@ increment_x
 increment_x_loop
     inc hl
     ld a, (hl)
-    inc a
-    cp $20
+    cp $ff
     jr z, increment_x_zero
+    inc a
 increment_x_update
     ld (hl), a
     inc hl
