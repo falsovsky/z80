@@ -29,26 +29,29 @@ main_start
     ld c, MAX_STARS
 
 main
-    ld a, (hl)
-    ld e, a
+    ld a, (hl)  ; HL points to X
+    ld e, a     ; Save X to E
     inc hl
-    
-    ld a, (hl)
-    ld d, a
-    
-    push hl
-    
-    call get_screen_address
-    call write_pixel
-    
-    pop hl
-    inc hl
-    dec c
-    jr nz, main
 
-    call increment_x
-    jr main_start
-    
+    ld a, (hl)  ; HL now points to Y
+    ld d, a     ; Save Y to D
+
+    push hl
+
+    call get_screen_address
+    ; Video RAM address for those X,Y is now in HL and the bit needed
+    ; to be set in that address value is in A
+    call write_pixel    ; Uses those values and writes the pixel
+
+    pop hl
+    inc hl      ; Next star
+
+    dec c       ; Decrement counter
+    jr nz, main ; Repeat if not zero
+
+    call increment_x    ; Increment X position in each star
+    jr main_start   ; Do it all over again
+
     pop bc
     ret
 
