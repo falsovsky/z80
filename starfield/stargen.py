@@ -17,6 +17,6 @@ for x in range(NumStars):
     y = random.randint(0,192 - 1)
     #z = random.randint(0,10)
     #f.write("\t\tdb %i, %i, %i\n" % (y ,x ,z))
-    f.write("\t\tdb %i, %i\n" % (y ,x))
+    f.write("\t\tdb %i, %i\n" % (x ,y))
 
 f.close()
