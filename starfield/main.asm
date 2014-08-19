@@ -8,11 +8,9 @@ clr_screen  EQU $0daf   ; ROM routine to clear the screen
 
 ; Star Structure
 ; X - 1 Byte        $00 - $20
-; Xbit - 1 Byte     $7 - $0
 ; Y - 1 Byte        $00 - $bf
 ; ----------
 ; Z - 1 Byte
-; ZLoop - 1Byte
 STAR_SIZE   EQU $4
 MAX_STARS   EQU 10
 
@@ -22,11 +20,12 @@ start
     xor a
     ld (tv_flag), a
     push bc
-
     call clear_screen
 
+main_start
     ld hl, StarRnd
     ld c, MAX_STARS
+
 main
     ld a, (hl)
     ld e, a
@@ -44,10 +43,36 @@ main
     inc hl
     dec c
     jr nz, main
+
+    ;call increment_x
+    ;jr main_start
     
     pop bc
     ret
 
+PROC
+; Increment X
+increment_x
+    push bc
+    ld hl, StarRnd
+    ld c, MAX_STARS
+increment_x_loop
+    inc hl
+    ld a, (hl)
+    inc a
+    cp $20
+    jr z, increment_x_zero
+increment_x_update
+    ld (hl), a
+    inc hl
+    dec c
+    jr nz, increment_x_loop
+    pop bc
+    ret
+increment_x_zero
+    ld a, $0
+    jr increment_x_update
+ENDP
 
 PROC
 ; Video Ram Address in HL

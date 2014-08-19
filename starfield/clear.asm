@@ -29,7 +29,7 @@ rom_define_borda    equ $2294; Rotina da ROM que define a borda
 screen_attribute equ $47
 
 ; Valor de 0 a 7
-border_color     equ $0
+border_color     equ $6
 
 clear_screen
     ld a, screen_attribute
