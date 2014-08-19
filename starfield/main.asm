@@ -50,28 +50,23 @@ main
 
 
 PROC
-tbl_origin  db  $0, $1, $2, $3, $4, $5, $6, $7
-tbl_dest    db  128, 64, 32, 16, 8, 4, 2, 1
-
+; Video Ram Address in HL
+; Pixel to write in A
 write_pixel
-    push hl
-    ld de, tbl_origin
-    ld hl, tbl_dest
-lookup_table_loop
     ld b, a
-    ld a, (de)
-    cp b
-    jr z, lookup_table_found
-    inc de
-    inc hl
+    ld c, $0
+    scf
+write_pixel_loop
+    ld a, c
+    rra
+    ld c, a
     ld a, b
-    jr lookup_table_loop
-lookup_table_found
+    jr z, write_pixel_do_it
+    dec b
+    jr write_pixel_loop
+write_pixel_do_it
     ld a, (hl)
-    ld b, a
-    pop hl
-    ld a, (hl)
-    or b
+    or c
     ld (hl), a
     ret
 ENDP    
