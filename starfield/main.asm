@@ -78,6 +78,7 @@ PROC
 ; Video Ram Address in HL
 ; Pixel to write in A
 write_pixel
+    push bc
     ld b, a
     ld c, $0
     scf
@@ -93,6 +94,7 @@ write_pixel_do_it
     ld a, (hl)
     or c
     ld (hl), a
+    pop bc
     ret
 ENDP    
 

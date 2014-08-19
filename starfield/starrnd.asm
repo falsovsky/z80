@@ -1,11 +1,11 @@
 StarRnd
+		db 31, 10
+		db 1, 1
+		db 2, 2
+		db 3, 3
+		db 4, 4
+		db 5, 5
+		db 6, 6
+		db 7, 7
+		db 40, 1
 		db 0, 0
-		db 1, 10
-		db 2, 20
-		db 3, 30
-		db 4, 40
-		db 5, 50
-		db 6, 60
-		db 7, 70
-		db 8, 80
-		db 9, 90
