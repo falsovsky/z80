@@ -38,11 +38,7 @@ main
     push hl
     
     call get_screen_address
-    ld b, a
-    ld a, (hl)
-    ;set b, a
-    or b
-    ld (hl), a
+    call write_pixel
     
     pop hl
     inc hl
@@ -52,8 +48,36 @@ main
     pop bc
     ret
 
+
 PROC
-; Calculate the high byte of the screen addressand store in H reg.
+tbl_origin  db  $0, $1, $2, $3, $4, $5, $6, $7
+tbl_dest    db  128, 64, 32, 16, 8, 4, 2, 1
+
+write_pixel
+    push hl
+    ld de, tbl_origin
+    ld hl, tbl_dest
+lookup_table_loop
+    ld b, a
+    ld a, (de)
+    cp b
+    jr z, lookup_table_found
+    inc de
+    inc hl
+    ld a, b
+    jr lookup_table_loop
+lookup_table_found
+    ld a, (hl)
+    ld b, a
+    pop hl
+    ld a, (hl)
+    or b
+    ld (hl), a
+    ret
+ENDP    
+
+PROC
+; Calculate the high byte of the screen address and store in H reg.
 ; On Entry: D reg = X coord,  E reg = Y coord
 ; On Exit: HL = screen address, A = pixel postion
 get_screen_address
@@ -81,7 +105,7 @@ get_screen_address
 	and %11100000
 	or l
 	ld l,a
-; Calculate pixel postion and store in A reg.
+; Calculate pixel position and store in A reg.
 	ld a,d
 	and %00000111
     ret
