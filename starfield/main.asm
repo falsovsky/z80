@@ -28,6 +28,25 @@ main_start
 
 main
     ld a, (hl)  ; HL points to X
+    dec a
+    ld d, a     ; Save X-1 to D
+    inc hl
+
+    ld a, (hl)  ; HL now points to Y
+    ld e, a     ; Save Y to E
+
+    push hl
+    push bc
+    call get_screen_address
+    ; Video RAM address for those X,Y is now in HL and the bit needed
+    ; to be set in that address value is in A
+    call clear_pixel    ; Uses those values and writes the pixel
+    pop bc
+    pop hl
+    
+    dec hl
+
+    ld a, (hl)  ; HL points to X
     ld d, a     ; Save X to D
     inc hl
 
@@ -39,7 +58,6 @@ main
     call get_screen_address
     ; Video RAM address for those X,Y is now in HL and the bit needed
     ; to be set in that address value is in A
-    ld d, $1            ; 1 - Write pixel
     call write_pixel    ; Uses those values and writes the pixel
     pop bc
     pop hl
@@ -65,7 +83,7 @@ initStars_loop
     push hl
     call getRandomX
     pop hl
-    
+
     ld (hl), a
 
     inc hl
@@ -155,9 +173,18 @@ increment_x
     ld c, MAX_STARS
 increment_x_loop
     ld a, (hl)
-    cp $ff
+    cp $fc
     jr z, increment_x_zero
-    inc a
+    jr nc, increment_x_zero 
+
+    inc hl  ; Skip to Y
+    inc hl  ; Skip to Speed
+
+    ld b, (hl)  ; Read speed to B
+    add a, b    ; Add speed to X
+
+    dec hl      ; Back to Y
+    dec hl      ; Back to X
 increment_x_update
     ld (hl), a
     inc hl
@@ -210,23 +237,36 @@ write_pixel_loop
     dec b
     jr write_pixel_loop
 write_pixel_do_it
-; o bit a settar está em C
-    ld a, d
-    cp $1
-    jr z, write_pixel_set
-write_pixel_unset
-    ;ld a, (hl)
-    ;xor c
-    ;ld (hl), a
-    jr write_pixel_end
-write_pixel_set
     ld a, (hl)
     or c
     ld (hl), a
-write_pixel_end
     pop bc
     ret
-ENDP    
+ENDP
+
+PROC
+; Video Ram Address in HL
+; Pixel to write in A
+clear_pixel
+    push bc
+    ld b, a
+    ld c, $0
+    scf
+clear_pixel_loop
+    ld a, c
+    rra
+    ld c, a
+    ld a, b
+    jr z, clear_pixel_do_it
+    dec b
+    jr write_pixel_loop
+clear_pixel_do_it
+    ld a, (hl)
+    or c
+    ld (hl), a
+    pop bc
+    ret
+ENDP
 
 PROC
 ; Calculate the high byte of the screen address and store in H reg.
