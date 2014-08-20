@@ -18,7 +18,7 @@ for idx in range(MAX_STARS):
         x = random.randint(1,250)
     xrandom.append(x)
 
-    speed = random.randint(1,3)
+    speed = random.randint(1,4)
     speedrandom.append(speed)
 
 for idx in range(0,191):

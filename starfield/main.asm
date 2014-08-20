@@ -12,7 +12,7 @@ clr_screen  EQU $0daf   ; ROM routine to clear the screen
 ; X         1 Byte  $0 - $ff
 ; Y         1 Byte  $0 - $c0
 ; Speed     1 Byte  $1 - $3
-MAX_STARS   EQU 10
+MAX_STARS   EQU 50
 
 start
     xor a
@@ -28,7 +28,12 @@ main_start
 
 main
     ld a, (hl)  ; HL points to X
-    dec a
+    inc hl      
+    inc hl      ; Jump to speed
+    ld e, (hl)
+    dec hl
+    dec hl
+    sbc a, e
     ld d, a     ; Save X-1 to D
     inc hl
 
@@ -40,7 +45,7 @@ main
     call get_screen_address
     ; Video RAM address for those X,Y is now in HL and the bit needed
     ; to be set in that address value is in A
-    call clear_pixel    ; Uses those values and writes the pixel
+    call clear_pixel    ; Uses those values clears the pixel
     pop bc
     pop hl
     
@@ -173,7 +178,7 @@ increment_x
     ld c, MAX_STARS
 increment_x_loop
     ld a, (hl)
-    cp $fc
+    cp $fb
     jr z, increment_x_zero
     jr nc, increment_x_zero 
 
@@ -250,8 +255,8 @@ PROC
 clear_pixel
     push bc
     ld b, a
-    ld c, $0
-    scf
+    ld c, $ff
+    and a   ; reset carry
 clear_pixel_loop
     ld a, c
     rra
@@ -259,10 +264,10 @@ clear_pixel_loop
     ld a, b
     jr z, clear_pixel_do_it
     dec b
-    jr write_pixel_loop
+    jr clear_pixel_loop
 clear_pixel_do_it
     ld a, (hl)
-    or c
+    and c
     ld (hl), a
     pop bc
     ret
