@@ -11,44 +11,22 @@ clr_screen  EQU $0daf   ; ROM routine to clear the screen
 ; Star Structure
 ; X - 1 Byte    $00 - $ff
 ; Y - 1 Byte    $00 - $c0
-; ----------
-; Z - 1 Byte
-STAR_SIZE   EQU $4
+; Speed - 1 Byte $1 - $3
 MAX_STARS   EQU 10
-
-INCLUDE "starrnd.asm"
 
 start
     xor a
     ld (tv_flag), a
     push bc
+
     call clear_screen
+    call initStars
 
 main_start
-    ld hl, StarRnd
+    ld hl, STARS
     ld c, MAX_STARS
 
 main
-    ld a, (hl)  ; HL points to X
-    dec a
-    ld d, a     ; Save X-1 to D
-    inc hl
-
-    ld a, (hl)  ; HL now points to Y
-    ld e, a     ; Save Y to E
-
-    push hl
-    push bc
-    call get_screen_address
-    ; Video RAM address for those X,Y is now in HL and the bit needed
-    ; to be set in that address value is in A
-    ld d, $0            ; 0 - Clear pixel
-    call write_pixel    ; Uses those values and writes the pixel
-    pop bc
-    pop hl
-
-    dec hl      ; Get back to X
-
     ld a, (hl)  ; HL points to X
     ld d, a     ; Save X to D
     inc hl
@@ -67,25 +45,112 @@ main
     pop hl
 
     inc hl      ; Next star
+    inc hl      ; Next star
 
     dec c       ; Decrement counter
     jr nz, main ; Repeat if not zero
 
-    push hl
-    push bc
-    call increment_x    ; Increment X position in each star
-    pop bc
-    pop hl
+    ;push hl
+    ;push bc
+    ;call increment_x    ; Increment X position in each star
+    ;pop bc
+    ;pop hl
     jr main_start   ; Do it all over again
 
     pop bc
     ret
 
 PROC
+initStars
+    push bc
+    ld d, MAX_STARS
+    ld hl, STARS
+initStars_loop
+    push hl
+    call getRandomX
+    pop hl
+    
+    ld (hl), a
+
+    inc hl
+
+    push hl
+    call getRandomY
+    pop hl
+
+    ld (hl), a
+
+    inc hl
+
+    push hl
+    call getRandomSpeed
+    pop hl
+
+    ld (hl), a
+
+    inc hl
+
+    dec d
+    jr nz, initStars_loop
+
+    pop bc
+    ret
+ENDP
+
+PROC
+getRandomX
+    ld hl, (xrandpos)
+    ld a, (hl)
+    cp $0
+    jr z, getRandomX_reset
+    inc hl
+    ld (xrandpos), hl
+    ret
+getRandomX_reset
+    ld hl, xranddata
+    ld (xrandpos), hl
+    jr getRandomX
+ENDP
+
+PROC
+getRandomY
+    push hl
+    ld hl, (yrandpos)
+    ld a, (hl)
+    cp $0
+    jr z, getRandomY_reset
+    inc hl
+    ld (yrandpos), hl
+    pop hl
+    ret
+getRandomY_reset
+    ld hl, yranddata
+    ld (yrandpos), hl
+    jr getRandomY
+ENDP
+
+PROC
+getRandomSpeed
+    push hl
+    ld hl, (speedrandpos)
+    ld a, (hl)
+    cp $0
+    jr z, getRandomSpeed_reset
+    inc hl
+    ld (speedrandpos), hl
+    pop hl
+    ret
+getRandomSpeed_reset
+    ld hl, speedranddata
+    ld (speedrandpos), hl
+    jr getRandomSpeed
+ENDP
+
+PROC
 ; Increment X
 increment_x
     push bc
-    ld hl, StarRnd
+    ld hl, STARS
     ld c, MAX_STARS
 increment_x_loop
     ld a, (hl)
@@ -101,7 +166,26 @@ increment_x_update
     pop bc
     ret
 increment_x_zero
-    ld a, $0
+    inc hl  ; Set to Y position
+    
+    push hl
+    call getRandomY
+    pop hl
+
+    ld (hl), a  ; Set Y = getRandomY
+    
+    inc hl  ; Set to speed position
+
+    push hl
+    call getRandomSpeed
+    pop hl
+    
+    ld (hl), a  ; Set Speed = getRandomSpeed
+
+    dec hl
+    dec hl  ; Get back to X position
+
+    ld a, $0    ; X = 0
     jr increment_x_update
 ENDP
 
@@ -128,7 +212,7 @@ write_pixel_do_it
     jr z, write_pixel_set
 write_pixel_unset
     ld a, (hl)
-    and c
+    xor c
     ld (hl), a
     jr write_pixel_end
 write_pixel_set
@@ -178,5 +262,12 @@ ENDP
 PROC
 INCLUDE "clear.asm"
 ENDP
+
+STARS
+    REPT MAX_STARS
+        DB $0,$0,$0
+    ENDM
+
+INCLUDE "randomvalues.asm"
 
 END start
