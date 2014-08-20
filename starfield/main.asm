@@ -9,9 +9,9 @@ clr_screen  EQU $0daf   ; ROM routine to clear the screen
 ; Screen is 256x192
 
 ; Star Structure
-; X - 1 Byte    $00 - $ff
-; Y - 1 Byte    $00 - $c0
-; Speed - 1 Byte $1 - $3
+; X         1 Byte  $0 - $ff
+; Y         1 Byte  $0 - $c0
+; Speed     1 Byte  $1 - $3
 MAX_STARS   EQU 10
 
 start
@@ -167,19 +167,19 @@ increment_x_update
     ret
 increment_x_zero
     inc hl  ; Set to Y position
-    
+
     push hl
     call getRandomY
     pop hl
 
     ld (hl), a  ; Set Y = getRandomY
-    
+
     inc hl  ; Set to speed position
 
     push hl
     call getRandomSpeed
     pop hl
-    
+
     ld (hl), a  ; Set Speed = getRandomSpeed
 
     dec hl
@@ -229,33 +229,33 @@ PROC
 ; On Entry: D reg = X coord,  E reg = Y coord
 ; On Exit: HL = screen address, A = pixel postion
 get_screen_address
-	ld a,e
-	and %00000111
-	ld h,a
-	ld a,e
-	rra
-	rra
-	rra
-	and %00011000
-	or h
-	or %01000000
-	ld h,a
+    ld a,e
+    and %00000111
+    ld h,a
+    ld a,e
+    rra
+    rra
+    rra
+    and %00011000
+    or h
+    or %01000000
+    ld h,a
 ; Calculate the low byte of the screen address and store in L reg.
-	ld a,d
-	rra
-	rra
-	rra
-	and %00011111
-	ld l,a
-	ld a,e
-	rla
-	rla
-	and %11100000
-	or l
-	ld l,a
+    ld a,d
+    rra
+    rra
+    rra
+    and %00011111
+    ld l,a
+    ld a,e
+    rla
+    rla
+    and %11100000
+    or l
+    ld l,a
 ; Calculate pixel position and store in A reg.
-	ld a,d
-	and %00000111
+    ld a,d
+    and %00000111
     ret
 ENDP
 
