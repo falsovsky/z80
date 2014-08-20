@@ -30,6 +30,26 @@ main_start
 
 main
     ld a, (hl)  ; HL points to X
+    dec a
+    ld e, a     ; Save X-1 to E
+    inc hl
+
+    ld a, (hl)  ; HL now points to Y
+    ld d, a     ; Save Y to D
+
+    push hl
+    push bc
+    call get_screen_address
+    ; Video RAM address for those X,Y is now in HL and the bit needed
+    ; to be set in that address value is in A
+    ld d, $0            ; 0 - Clear pixel
+    call write_pixel    ; Uses those values and writes the pixel
+    pop bc
+    pop hl
+
+    dec hl      ; Get back to X
+
+    ld a, (hl)  ; HL points to X
     ld e, a     ; Save X to E
     inc hl
 
@@ -37,14 +57,15 @@ main
     ld d, a     ; Save Y to D
 
     push hl
-
+    push bc
     call get_screen_address
     ; Video RAM address for those X,Y is now in HL and the bit needed
     ; to be set in that address value is in A
-    ld d, $1
+    ld d, $1            ; 1 - Write pixel
     call write_pixel    ; Uses those values and writes the pixel
-
+    pop bc
     pop hl
+
     inc hl      ; Next star
 
     dec c       ; Decrement counter
@@ -97,12 +118,11 @@ write_pixel_loop
     dec b
     jr write_pixel_loop
 write_pixel_do_it
+; o bit a settar está em C
     ld a, d
     cp $1
     jr z, write_pixel_set
-    ld a, (hl)
-    xor c
-    ld (hl), a
+write_pixel_unset
     jr write_pixel_end
 write_pixel_set
     ld a, (hl)
