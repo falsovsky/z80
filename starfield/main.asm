@@ -176,28 +176,6 @@ get_screen_address
 ENDP
 
 PROC
-;Input:
-; DE = Current screen address
-;
-;Output:
-; DE = (Y + 1) screen address
-;
-increment_y
-    inc d
-    ld a,d
-    and 7
-    ret nz
-    ld a,e
-    add a,32
-    ld e,a
-    ret c
-    ld a,d
-    sub 8
-    ld d,a
-    ret
-ENDP
-
-PROC
 INCLUDE "clear.asm"
 ENDP
 
