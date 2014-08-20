@@ -31,11 +31,11 @@ main_start
 main
     ld a, (hl)  ; HL points to X
     dec a
-    ld e, a     ; Save X-1 to E
+    ld d, a     ; Save X-1 to D
     inc hl
 
     ld a, (hl)  ; HL now points to Y
-    ld d, a     ; Save Y to D
+    ld e, a     ; Save Y to E
 
     push hl
     push bc
@@ -50,11 +50,11 @@ main
     dec hl      ; Get back to X
 
     ld a, (hl)  ; HL points to X
-    ld e, a     ; Save X to E
+    ld d, a     ; Save X to D
     inc hl
 
     ld a, (hl)  ; HL now points to Y
-    ld d, a     ; Save Y to D
+    ld e, a     ; Save Y to E
 
     push hl
     push bc
@@ -71,7 +71,11 @@ main
     dec c       ; Decrement counter
     jr nz, main ; Repeat if not zero
 
+    push hl
+    push bc
     call increment_x    ; Increment X position in each star
+    pop bc
+    pop hl
     jr main_start   ; Do it all over again
 
     pop bc
@@ -84,13 +88,13 @@ increment_x
     ld hl, StarRnd
     ld c, MAX_STARS
 increment_x_loop
-    inc hl
     ld a, (hl)
     cp $ff
     jr z, increment_x_zero
     inc a
 increment_x_update
     ld (hl), a
+    inc hl
     inc hl
     dec c
     jr nz, increment_x_loop
@@ -123,6 +127,9 @@ write_pixel_do_it
     cp $1
     jr z, write_pixel_set
 write_pixel_unset
+    ld a, (hl)
+    and c
+    ld (hl), a
     jr write_pixel_end
 write_pixel_set
     ld a, (hl)
