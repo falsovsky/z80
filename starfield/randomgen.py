@@ -21,7 +21,7 @@ for idx in range(MAX_STARS):
     speed = random.randint(1,3)
     speedrandom.append(speed)
 
-for idx in range(Generate):
+for idx in range(0,191):
     y = random.randint(1,191)
     while(y in yrandom):
         y = random.randint(1,191)
