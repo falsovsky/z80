@@ -12,7 +12,9 @@ clr_screen  EQU $0daf   ; ROM routine to clear the screen
 ; X         1 Byte  $0 - $ff
 ; Y         1 Byte  $0 - $c0
 ; Speed     1 Byte  $1 - $3
-MAX_STARS   EQU 50
+; PrevX
+; PrevY
+MAX_STARS   EQU 60
 
 start
     xor a
@@ -27,18 +29,15 @@ main_start
     ld c, MAX_STARS
 
 main
-    ld a, (hl)  ; HL points to X
-    inc hl      
-    inc hl      ; Jump to speed
-    ld e, (hl)
-    dec hl
-    dec hl
-    sbc a, e
-    ld d, a     ; Save X-1 to D
-    inc hl
+    inc hl      ; Y
+    inc hl      ; Speed
+    inc hl      ; PrevX
+    ld a, (hl)
+    ld d, a     ; Save PrevX to D
+    inc hl      ; PrevY
 
-    ld a, (hl)  ; HL now points to Y
-    ld e, a     ; Save Y to E
+    ld a, (hl)
+    ld e, a     ; Save PrevY to E
 
     push hl
     push bc
@@ -49,7 +48,10 @@ main
     pop bc
     pop hl
     
-    dec hl
+    dec hl      ; PrevX
+    dec hl      ; Speed
+    dec hl      ; Y
+    dec hl      ; X
 
     ld a, (hl)  ; HL points to X
     ld d, a     ; Save X to D
@@ -67,7 +69,9 @@ main
     pop bc
     pop hl
 
-    inc hl      ; Next star
+    inc hl      ; Speed
+    inc hl      ; PrevX
+    inc hl      ; PrevY
     inc hl      ; Next star
 
     dec c       ; Decrement counter
@@ -91,7 +95,7 @@ initStars_loop
 
     ld (hl), a
 
-    inc hl
+    inc hl  ; Y
 
     push hl
     call getRandomY
@@ -99,7 +103,7 @@ initStars_loop
 
     ld (hl), a
 
-    inc hl
+    inc hl  ; Speed
 
     push hl
     call getRandomSpeed
@@ -107,7 +111,9 @@ initStars_loop
 
     ld (hl), a
 
-    inc hl
+    inc hl  ; PrevX
+    inc hl  ; PrevY
+    inc hl  ; Next one
 
     dec d
     jr nz, initStars_loop
@@ -177,24 +183,44 @@ increment_x
     ld hl, STARS
     ld c, MAX_STARS
 increment_x_loop
+    push de
+    ld d, (hl)  ; Save current X to D
+    inc hl      ; Y
+    ld e, (hl)  ; Save current Y to E
+    inc hl      ; Speed
+    inc hl      ; PrevX
+    ld (hl), d
+    inc hl      ; PrevY
+    ld (hl), e
+    dec hl      ; PrevX
+    dec hl      ; Speed
+    dec hl      ; Y
+    dec hl      ; X
+    pop de
+
     ld a, (hl)
-    cp $fb
+    cp $ff
     jr z, increment_x_zero
-    jr nc, increment_x_zero 
 
     inc hl  ; Skip to Y
     inc hl  ; Skip to Speed
 
     ld b, (hl)  ; Read speed to B
-    add a, b    ; Add speed to X
 
     dec hl      ; Back to Y
     dec hl      ; Back to X
+
+    add a, b    ; Add speed to X
+
+    jr c, increment_x_zero
+    
 increment_x_update
     ld (hl), a
-    inc hl
-    inc hl
-    inc hl
+    inc hl  ; Y
+    inc hl  ; Speed
+    inc hl  ; PrevX
+    inc hl  ; PrevY
+    inc hl  ; Next
     dec c
     jr nz, increment_x_loop
     pop bc
@@ -314,7 +340,7 @@ ENDP
 
 STARS
     REPT MAX_STARS
-        DB $0,$0,$0
+        DB $0,$0, $0, $0,$0
     ENDM
 
 INCLUDE "randomvalues.asm"

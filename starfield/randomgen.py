@@ -12,7 +12,7 @@ speedrandom = []
 
 random.seed()
 
-for idx in range(MAX_STARS):
+for idx in range(Generate):
     x = random.randint(1,250)
     while(x in xrandom):
         x = random.randint(1,250)
