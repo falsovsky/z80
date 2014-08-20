@@ -51,7 +51,6 @@ main
     jr nz, main ; Repeat if not zero
 
     call increment_x    ; Increment X position in each star
-
     jr main_start   ; Do it all over again
 
     pop bc
@@ -96,22 +95,26 @@ ENDP
 
 PROC
 getRandomX
+    push hl
+getRandomX_loop
     ld hl, (xrandpos)
     ld a, (hl)
     cp $0
     jr z, getRandomX_reset
     inc hl
     ld (xrandpos), hl
+    pop hl
     ret
 getRandomX_reset
     ld hl, xranddata
     ld (xrandpos), hl
-    jr getRandomX
+    jr getRandomX_loop
 ENDP
 
 PROC
 getRandomY
     push hl
+getRandomY_loop
     ld hl, (yrandpos)
     ld a, (hl)
     cp $0
@@ -123,12 +126,13 @@ getRandomY
 getRandomY_reset
     ld hl, yranddata
     ld (yrandpos), hl
-    jr getRandomY
+    jr getRandomY_loop
 ENDP
 
 PROC
 getRandomSpeed
     push hl
+getRandomSpeed_loop    
     ld hl, (speedrandpos)
     ld a, (hl)
     cp $0
@@ -140,7 +144,7 @@ getRandomSpeed
 getRandomSpeed_reset
     ld hl, speedranddata
     ld (speedrandpos), hl
-    jr getRandomSpeed
+    jr getRandomSpeed_loop
 ENDP
 
 PROC
@@ -164,6 +168,7 @@ increment_x_update
     pop bc
     ret
 increment_x_zero
+    push bc
     inc hl  ; Set to Y position
 
     push hl
@@ -184,6 +189,7 @@ increment_x_zero
     dec hl  ; Get back to X position
 
     ld a, $0    ; X = 0
+    pop bc
     jr increment_x_update
 ENDP
 
@@ -209,9 +215,9 @@ write_pixel_do_it
     cp $1
     jr z, write_pixel_set
 write_pixel_unset
-    ld a, (hl)
-    xor c
-    ld (hl), a
+    ;ld a, (hl)
+    ;xor c
+    ;ld (hl), a
     jr write_pixel_end
 write_pixel_set
     ld a, (hl)
