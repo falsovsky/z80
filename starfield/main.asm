@@ -50,11 +50,8 @@ main
     dec c       ; Decrement counter
     jr nz, main ; Repeat if not zero
 
-    ;push hl
-    ;push bc
-    ;call increment_x    ; Increment X position in each star
-    ;pop bc
-    ;pop hl
+    call increment_x    ; Increment X position in each star
+
     jr main_start   ; Do it all over again
 
     pop bc
@@ -159,6 +156,7 @@ increment_x_loop
     inc a
 increment_x_update
     ld (hl), a
+    inc hl
     inc hl
     inc hl
     dec c
