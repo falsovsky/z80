@@ -6,6 +6,9 @@ tv_flag     EQU $5c3c   ; TV flags
 last_k      EQU $5c08   ; Last pressed key
 clr_screen  EQU $0daf   ; ROM routine to clear the screen
 
+; http://www.z80.info/pseudo-random.txt
+; seed - http://www.wearmouth.demon.co.uk/sys/frames.htm
+
 ; Screen is 256x192
 
 ; Star Structure
@@ -21,17 +24,18 @@ start
     ld (tv_flag), a
     push bc
 
-    call clear_screen
-    call initStars
+    call clear_screen   ; Clear the screen
+    call initStars  ; Initialize the number of stars defined in MAX_STARS
 
 main_start
-    ld hl, STARS
+    ld hl, STARS    ; Points to X
     ld c, MAX_STARS
 
 main
-    inc hl      ; Y
-    inc hl      ; Speed
-    inc hl      ; PrevX
+; CLEAR THE LAST POSITION
+    ld de, $3   ; Skip to PrevX
+    adc hl, de
+
     ld a, (hl)
     ld d, a     ; Save PrevX to D
     inc hl      ; PrevY
@@ -39,40 +43,38 @@ main
     ld a, (hl)
     ld e, a     ; Save PrevY to E
 
-    push hl
     push bc
+    push hl
     call get_screen_address
     ; Video RAM address for those X,Y is now in HL and the bit needed
     ; to be set in that address value is in A
     call clear_pixel    ; Uses those values clears the pixel
-    pop bc
     pop hl
-    
-    dec hl      ; PrevX
-    dec hl      ; Speed
-    dec hl      ; Y
-    dec hl      ; X
 
+    ld bc, $4   ; Go back to X
+    sbc hl, bc
+
+    pop bc
+; WRITES THE PIXEL
     ld a, (hl)  ; HL points to X
     ld d, a     ; Save X to D
-    inc hl
+    inc hl      ; Y
 
-    ld a, (hl)  ; HL now points to Y
+    ld a, (hl)
     ld e, a     ; Save Y to E
 
-    push hl
     push bc
+    push hl
     call get_screen_address
     ; Video RAM address for those X,Y is now in HL and the bit needed
     ; to be set in that address value is in A
     call write_pixel    ; Uses those values and writes the pixel
-    pop bc
     pop hl
 
-    inc hl      ; Speed
-    inc hl      ; PrevX
-    inc hl      ; PrevY
-    inc hl      ; Next star
+    ld bc, $4   ; Jump 4 positions - Next star
+    adc hl, bc
+
+    pop bc
 
     dec c       ; Decrement counter
     jr nz, main ; Repeat if not zero
@@ -84,45 +86,44 @@ main
     ret
 
 PROC
+; Initialize stars X and Y with "random" values
 initStars
     push bc
-    ld d, MAX_STARS
-    ld hl, STARS
+    ld d, MAX_STARS ; Number of stars to process
+    ld hl, STARS    ; HL points to X of first start
 initStars_loop
     push hl
-    call getRandomX
+    call getRandomX ; Get a random value for X | 1 - 250 | TODO: 255?
     pop hl
-
-    ld (hl), a
-
-    inc hl  ; Y
+    ld (hl), a      ; Set X to random value
+    
+    inc hl          ; points to Y
 
     push hl
-    call getRandomY
+    call getRandomY ; Get a random value for Y | 1 - 191 | TODO : allow 0
     pop hl
+    ld (hl), a      ; Set Y to random value
 
-    ld (hl), a
-
-    inc hl  ; Speed
+    inc hl          ; points to Speed
 
     push hl
-    call getRandomSpeed
+    call getRandomSpeed ; Get a random value for Speed | 1 - 4
     pop hl
+    ld (hl), a      ; Set Speed to random value
 
-    ld (hl), a
+    ld bc, $3       ; Jump to next star
+    adc hl, bc      ; Skip PrevX and PrevY
 
-    inc hl  ; PrevX
-    inc hl  ; PrevY
-    inc hl  ; Next one
-
-    dec d
-    jr nz, initStars_loop
+    dec d           ; Decrement counter
+    jr nz, initStars_loop   ; If not zero, do it again
 
     pop bc
     ret
 ENDP
 
 PROC
+; Gets a value a from a list of pre-calculated values
+; Returns to begin after 0 is found | TODO: change this
 getRandomX
     push hl
 getRandomX_loop
@@ -141,6 +142,8 @@ getRandomX_reset
 ENDP
 
 PROC
+; Gets a value a from a list of pre-calculated values
+; Returns to begin after 0 is found | TODO: change this
 getRandomY
     push hl
 getRandomY_loop
@@ -159,6 +162,8 @@ getRandomY_reset
 ENDP
 
 PROC
+; Gets a value a from a list of pre-calculated values
+; Returns to begin after 0 is found | TODO: change this
 getRandomSpeed
     push hl
 getRandomSpeed_loop    
@@ -183,68 +188,71 @@ increment_x
     ld hl, STARS
     ld c, MAX_STARS
 increment_x_loop
-    push de
+; First lets copy current position to previous position
     ld d, (hl)  ; Save current X to D
-    inc hl      ; Y
+    inc hl      ; points to Y
     ld e, (hl)  ; Save current Y to E
-    inc hl      ; Speed
-    inc hl      ; PrevX
-    ld (hl), d
+    
+    inc hl      ; points to Speed
+    inc hl      ; points to PrevX
+    ld (hl), d  ; Save X
     inc hl      ; PrevY
-    ld (hl), e
-    dec hl      ; PrevX
-    dec hl      ; Speed
-    dec hl      ; Y
-    dec hl      ; X
-    pop de
+    ld (hl), e  ; Save Y
+    
+    ld de, $4
+    sbc hl, de  ; Go back to X
 
-    ld a, (hl)
+    ld a, (hl)  ; Is X at $FF - end of screen
     cp $ff
-    jr z, increment_x_zero
+    jr z, increment_x_zero  ; Yes, lets reset
 
-    inc hl  ; Skip to Y
-    inc hl  ; Skip to Speed
+; Increments X position by speed value
+; X = X + Y
+
+    inc hl      ; points to Y
+    inc hl      ; points to Speed
 
     ld b, (hl)  ; Read speed to B
 
     dec hl      ; Back to Y
     dec hl      ; Back to X
 
-    add a, b    ; Add speed to X
+    add a, b    ; X = X + Speed
+    jr c, increment_x_zero ; If carry is set, it passed $ff, lets reset
 
-    jr c, increment_x_zero
-    
 increment_x_update
-    ld (hl), a
-    inc hl  ; Y
-    inc hl  ; Speed
-    inc hl  ; PrevX
-    inc hl  ; PrevY
-    inc hl  ; Next
-    dec c
-    jr nz, increment_x_loop
+; Saves to X the value in A
+    ld (hl), a  ; Save X with the value in A
+
+    ld de, $5   ; Skip 5 bytes to the next star
+    adc hl, de
+
+    dec c       ; Decrement counter
+    jr nz, increment_x_loop ; If not zero, do it again
+
     pop bc
     ret
+
 increment_x_zero
+; Sets X to 0 and Y and Speed to random values
     push bc
-    inc hl  ; Set to Y position
+    inc hl      ; point to Y
 
     push hl
-    call getRandomY
+    call getRandomY ; Get a random Y value
     pop hl
-
     ld (hl), a  ; Set Y = getRandomY
 
-    inc hl  ; Set to speed position
+    inc hl      ; point to speed
 
     push hl
-    call getRandomSpeed
+    call getRandomSpeed ; Get a random Speed value
     pop hl
 
     ld (hl), a  ; Set Speed = getRandomSpeed
 
-    dec hl
-    dec hl  ; Get back to X position
+    ld de, $2
+    sbc hl, de  ; Get back to X position
 
     ld a, $0    ; X = 0
     pop bc
