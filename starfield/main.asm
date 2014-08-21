@@ -14,7 +14,7 @@ clr_screen  EQU $0daf   ; ROM routine to clear the screen
 ; Speed     1 Byte  $1 - $3
 ; PrevX
 ; PrevY
-MAX_STARS   EQU 60
+MAX_STARS   EQU 100
 
 start
     xor a
@@ -167,7 +167,7 @@ initRandomX
     push hl
     push bc
     ld d, 1
-    ld e, 250
+    ld e, 255
     call get_rnd    ; Get a random value <= 255
     pop bc
     pop hl
@@ -207,7 +207,7 @@ initRandomSpeed
     push hl
     push bc
     ld d, 1
-    ld e, 4
+    ld e, 10
     call get_rnd    ; Get a random value <= 255
     pop bc
     pop hl
