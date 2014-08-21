@@ -86,22 +86,75 @@ main
     ret
 
 PROC
+; D = valor minimo
+; E = valor maximo
+Seed dw  $fa
+
+get_rnd
+    push bc ; Guarda o valor de RET na stack
+
+get_rnd_loop
+    ld a, (Seed)
+    ld b, a 
+
+    rrca ; multiply by 32
+    rrca
+    rrca
+    xor 0x1f
+
+    add a, b
+    sbc a, 255 ; carry
+
+    ld (Seed), a
+
+    ld h, a ; Save A to H
+
+    ld a, e ; Valor maximo em A
+    cp h
+
+    jr z, get_rnd_ret   ; É igual
+    jr c, get_rnd_loop ; Se for menor
+
+    ld a, d
+    cp h
+
+    jr z, get_rnd_ret
+    jr c, get_rnd_ret
+
+    jr get_rnd_loop
+
+get_rnd_ret
+    ld a, h
+    pop bc  ; Tira o valor de RET da stack
+    ret
+ENDP
+
+PROC
 ; Initialize stars X and Y with "random" values
 initStars
     push bc
     ld d, MAX_STARS ; Number of stars to process
     ld hl, STARS    ; HL points to X of first start
+
 initStars_loop
+    push de
+
     push hl
-    call getRandomX ; Get a random value for X | 1 - 250 | TODO: 255?
+    ld d, 0
+    ld e, 250
+    call get_rnd    ; Get a random value <= 255
     pop hl
+
     ld (hl), a      ; Set X to random value
-    
+
     inc hl          ; points to Y
 
     push hl
-    call getRandomY ; Get a random value for Y | 1 - 191 | TODO : allow 0
+    ld d, 0
+    ld e, 191
+    call get_rnd    ; Get a random value <= 191
     pop hl
+
     ld (hl), a      ; Set Y to random value
 
     inc hl          ; points to Speed
@@ -109,56 +162,24 @@ initStars_loop
     push hl
     call getRandomSpeed ; Get a random value for Speed | 1 - 4
     pop hl
+
+    ;push hl
+    ;ld d, 1
+    ;ld e, 4
+    ;call get_rnd
+    ;pop hl
+
     ld (hl), a      ; Set Speed to random value
 
     ld bc, $3       ; Jump to next star
     adc hl, bc      ; Skip PrevX and PrevY
 
+    pop de    
     dec d           ; Decrement counter
     jr nz, initStars_loop   ; If not zero, do it again
 
     pop bc
     ret
-ENDP
-
-PROC
-; Gets a value a from a list of pre-calculated values
-; Returns to begin after 0 is found | TODO: change this
-getRandomX
-    push hl
-getRandomX_loop
-    ld hl, (xrandpos)
-    ld a, (hl)
-    cp $0
-    jr z, getRandomX_reset
-    inc hl
-    ld (xrandpos), hl
-    pop hl
-    ret
-getRandomX_reset
-    ld hl, xranddata
-    ld (xrandpos), hl
-    jr getRandomX_loop
-ENDP
-
-PROC
-; Gets a value a from a list of pre-calculated values
-; Returns to begin after 0 is found | TODO: change this
-getRandomY
-    push hl
-getRandomY_loop
-    ld hl, (yrandpos)
-    ld a, (hl)
-    cp $0
-    jr z, getRandomY_reset
-    inc hl
-    ld (yrandpos), hl
-    pop hl
-    ret
-getRandomY_reset
-    ld hl, yranddata
-    ld (yrandpos), hl
-    jr getRandomY_loop
 ENDP
 
 PROC
@@ -239,8 +260,11 @@ increment_x_zero
     inc hl      ; point to Y
 
     push hl
-    call getRandomY ; Get a random Y value
+    ld d, 0
+    ld e, 191
+    call get_rnd    ; Get a random value below 191
     pop hl
+
     ld (hl), a  ; Set Y = getRandomY
 
     inc hl      ; point to speed
