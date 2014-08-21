@@ -1,10 +1,7 @@
 all: starfield
 
-starfield: starrnd.asm
-		pasmo.exe -v --tap --err main.asm main.tap
-
-starrnd.asm:
-		python randomgen.py
+starfield:
+		pasmo.exe -v --tap --err main.asm starfield.tap
 
 clean:
-		rm -rf *.tap starrnd.asm
+		rm -rf *.tap
