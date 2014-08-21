@@ -9,11 +9,11 @@ clr_screen  EQU $0daf   ; ROM routine to clear the screen
 ; Screen is 256x192
 
 ; Star Structure
-; X         1 Byte  $0 - $ff
-; Y         1 Byte  $0 - $c0
-; Speed     1 Byte  $1 - $3
-; PrevX
-; PrevY
+; X         1 Byte
+; Y         1 Byte
+; Speed     1 Byte
+; PrevX     1 Byte
+; PrevY     1 Byte
 MAX_STARS   EQU 100
 
 start
@@ -160,7 +160,7 @@ initRandom
 
 
     ; X
-    ld b, MAX_STARS*2
+    ld b, MAX_STARS
     ld hl, xranddata
 initRandomX
     
@@ -501,7 +501,7 @@ yrandpos        dw yranddata
 speedrandpos    dw speedranddata
 
 xranddata
-    REPT (MAX_STARS*2) + 1
+    REPT MAX_STARS + 1
         db  $0
     ENDM
 
