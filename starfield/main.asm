@@ -6,9 +6,6 @@ tv_flag     EQU $5c3c   ; TV flags
 last_k      EQU $5c08   ; Last pressed key
 clr_screen  EQU $0daf   ; ROM routine to clear the screen
 
-; http://www.z80.info/pseudo-random.txt
-; seed - http://www.wearmouth.demon.co.uk/sys/frames.htm
-
 ; Screen is 256x192
 
 ; Star Structure
@@ -25,6 +22,7 @@ start
     push bc
 
     call clear_screen   ; Clear the screen
+    call initRandom
     call initStars  ; Initialize the number of stars defined in MAX_STARS
 
 main_start
@@ -34,7 +32,7 @@ main_start
 main
 ; CLEAR THE LAST POSITION
     ld de, $3   ; Skip to PrevX
-    adc hl, de
+    add hl, de
 
     ld a, (hl)
     ld d, a     ; Save PrevX to D
@@ -72,7 +70,7 @@ main
     pop hl
 
     ld bc, $4   ; Jump 4 positions - Next star
-    adc hl, bc
+    add hl, bc
 
     pop bc
 
@@ -88,25 +86,52 @@ main
 PROC
 ; D = valor minimo
 ; E = valor maximo
-Seed dw  $fa
+table
+    db   82,97,120,111,102,116,20,12
 
 get_rnd
     push bc ; Guarda o valor de RET na stack
 
 get_rnd_loop
-    ld a, (Seed)
-    ld b, a 
+    push de
+    ld de, 0     ; c,i
+    ld b, 0
+    ld c, e
+    ld hl, table
+    add hl, bc
 
-    rrca ; multiply by 32
-    rrca
-    rrca
-    xor 0x1f
+    ld c, (hl)   ; y = q[i]
 
-    add a, b
-    sbc a, 255 ; carry
+    push hl
 
-    ld (Seed), a
+    ld a, e      ; i = ( i + 1 ) & 7
+    inc a
+    and 7
+    ld e, a
 
+    ld h, c      ; t = 256 * y
+    ld l, b
+
+    sbc hl, bc    ; t = 255 * y
+    sbc hl, bc    ; t = 254 * y
+    sbc hl, bc    ; t = 253 * y
+
+    ld c, d
+    add hl, bc    ; t = 253 * y + c
+
+    ld d, h      ; c = t / 256
+
+    ld (get_rnd_loop+2), de
+
+    ld a,l      ; x = t % 256
+    cpl           ; x = (b-1) - x = -x - 1 = ~x + 1 - 1 = ~x
+
+    pop hl
+
+    ld (hl), a   ; q[i] = x
+    
+    pop de
+    
     ld h, a ; Save A to H
 
     ld a, e ; Valor maximo em A
@@ -130,6 +155,74 @@ get_rnd_ret
 ENDP
 
 PROC
+initRandom
+    push bc
+
+
+    ; X
+    ld b, MAX_STARS*2
+    ld hl, xranddata
+initRandomX
+    
+    push hl
+    push bc
+    ld d, 1
+    ld e, 250
+    call get_rnd    ; Get a random value <= 255
+    pop bc
+    pop hl
+    
+    ld (hl), a
+    inc hl
+
+    dec b
+    jr nz, initRandomX
+
+
+    ; Y
+    ld b, MAX_STARS*2
+    ld hl, yranddata
+initRandomY
+
+    push hl
+    push bc
+    ld d, 1
+    ld e, 191
+    call get_rnd    ; Get a random value <= 255
+    pop bc
+    pop hl
+    
+    ld (hl), a
+    inc hl
+
+    dec b
+    jr nz, initRandomY
+
+
+    ; Speed
+    ld b, MAX_STARS*2
+    ld hl, speedranddata
+initRandomSpeed
+
+    push hl
+    push bc
+    ld d, 1
+    ld e, 4
+    call get_rnd    ; Get a random value <= 255
+    pop bc
+    pop hl
+    
+    ld (hl), a
+    inc hl
+
+    dec b
+    jr nz, initRandomSpeed
+
+    pop bc
+    ret
+ENDP
+
+PROC
 ; Initialize stars X and Y with "random" values
 initStars
     push bc
@@ -140,9 +233,7 @@ initStars_loop
     push de
 
     push hl
-    ld d, 0
-    ld e, 250
-    call get_rnd    ; Get a random value <= 255
+    call getRandomX
     pop hl
 
     ld (hl), a      ; Set X to random value
@@ -150,9 +241,7 @@ initStars_loop
     inc hl          ; points to Y
 
     push hl
-    ld d, 0
-    ld e, 191
-    call get_rnd    ; Get a random value <= 191
+    call getRandomY
     pop hl
 
     ld (hl), a      ; Set Y to random value
@@ -163,16 +252,10 @@ initStars_loop
     call getRandomSpeed ; Get a random value for Speed | 1 - 4
     pop hl
 
-    ;push hl
-    ;ld d, 1
-    ;ld e, 4
-    ;call get_rnd
-    ;pop hl
-
     ld (hl), a      ; Set Speed to random value
 
     ld bc, $3       ; Jump to next star
-    adc hl, bc      ; Skip PrevX and PrevY
+    add hl, bc      ; Skip PrevX and PrevY
 
     pop de    
     dec d           ; Decrement counter
@@ -180,6 +263,46 @@ initStars_loop
 
     pop bc
     ret
+ENDP
+
+PROC
+; Gets a value a from a list of pre-calculated values
+; Returns to begin after 0 is found | TODO: change this
+getRandomX
+    push hl
+getRandomX_loop
+    ld hl, (xrandpos)
+    ld a, (hl)
+    cp $0
+    jr z, getRandomX_reset
+    inc hl
+    ld (xrandpos), hl
+    pop hl
+    ret
+getRandomX_reset
+    ld hl, xranddata
+    ld (xrandpos), hl
+    jr getRandomX_loop
+ENDP
+
+PROC
+; Gets a value a from a list of pre-calculated values
+; Returns to begin after 0 is found | TODO: change this
+getRandomY
+    push hl
+getRandomY_loop
+    ld hl, (yrandpos)
+    ld a, (hl)
+    cp $0
+    jr z, getRandomY_reset
+    inc hl
+    ld (yrandpos), hl
+    pop hl
+    ret
+getRandomY_reset
+    ld hl, yranddata
+    ld (yrandpos), hl
+    jr getRandomY_loop
 ENDP
 
 PROC
@@ -246,7 +369,7 @@ increment_x_update
     ld (hl), a  ; Save X with the value in A
 
     ld de, $5   ; Skip 5 bytes to the next star
-    adc hl, de
+    add hl, de
 
     dec c       ; Decrement counter
     jr nz, increment_x_loop ; If not zero, do it again
@@ -260,9 +383,7 @@ increment_x_zero
     inc hl      ; point to Y
 
     push hl
-    ld d, 0
-    ld e, 191
-    call get_rnd    ; Get a random value below 191
+    call getRandomY
     pop hl
 
     ld (hl), a  ; Set Y = getRandomY
@@ -375,6 +496,23 @@ STARS
         DB $0,$0, $0, $0,$0
     ENDM
 
-INCLUDE "randomvalues.asm"
+xrandpos        dw xranddata
+yrandpos        dw yranddata
+speedrandpos    dw speedranddata
+
+xranddata
+    REPT (MAX_STARS*2) + 1
+        db  $0
+    ENDM
+
+yranddata
+    REPT (MAX_STARS*2) + 1
+        db  $0
+    ENDM
+
+speedranddata
+    REPT (MAX_STARS*2) + 1
+        db  $0
+    ENDM
 
 END start
