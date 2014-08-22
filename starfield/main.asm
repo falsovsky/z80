@@ -158,25 +158,6 @@ PROC
 initRandom
     push bc
 
-; Y
-    ld b, MAX_STARS*2
-    ld hl, yranddata
-
-initRandomY
-    push hl
-    push bc
-    ld d, 1
-    ld e, 191
-    call get_rnd
-    pop bc
-    pop hl
-    
-    ld (hl), a
-    inc hl
-
-    dec b
-    jr nz, initRandomY
-
 ; Speed
     ld b, MAX_STARS*2
     ld hl, speedranddata
@@ -221,7 +202,9 @@ initStars_loop
     inc hl          ; points to Y
 
     push hl
-    call getRandomY
+    ld d, 1
+    ld e, 191
+    call get_rnd
     pop hl
 
     ld (hl), a      ; Set Y to random value
@@ -243,26 +226,6 @@ initStars_loop
 
     pop bc
     ret
-ENDP
-
-PROC
-; Gets a value a from a list of pre-calculated values
-; Returns to begin after 0 is found | TODO: change this
-getRandomY
-    push hl
-getRandomY_loop
-    ld hl, (yrandpos)
-    ld a, (hl)
-    cp $0
-    jr z, getRandomY_reset
-    inc hl
-    ld (yrandpos), hl
-    pop hl
-    ret
-getRandomY_reset
-    ld hl, yranddata
-    ld (yrandpos), hl
-    jr getRandomY_loop
 ENDP
 
 PROC
@@ -343,7 +306,9 @@ increment_x_zero
     inc hl      ; point to Y
 
     push hl
-    call getRandomY
+    ld d, 1
+    ld e, 191
+    call get_rnd
     pop hl
 
     ld (hl), a  ; Set Y = getRandomY
@@ -456,13 +421,7 @@ STARS
         DB $0,$0, $0, $0,$0
     ENDM
 
-yrandpos        dw yranddata
 speedrandpos    dw speedranddata
-
-yranddata
-    REPT (MAX_STARS*2) + 1
-        db  $0
-    ENDM
 
 speedranddata
     REPT (MAX_STARS*2) + 1
