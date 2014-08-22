@@ -4,7 +4,6 @@ org $7530
 ; System variables
 tv_flag     EQU $5c3c   ; TV flags
 last_k      EQU $5c08   ; Last pressed key
-clr_screen  EQU $0daf   ; ROM routine to clear the screen
 
 ; Screen is 256x192
 
@@ -22,45 +21,46 @@ start
     push bc
 
     call clear_screen   ; Clear the screen
-    call initStars  ; Initialize the number of stars defined in MAX_STARS
+    call init_stars  ; Initialize the number of stars defined in MAX_STARS
 
 main_start
-    ld hl, STARS    ; Points to X
-    ld c, MAX_STARS
+    ld hl, STARS    ; points to X
+    ld c, MAX_STARS ; Set counter value
 
 main
 ; CLEAR THE LAST POSITION
-    ld de, $3   ; Skip to PrevX
-    add hl, de
+    push bc     ; save MAX_STARS in the stack
+
+    ld de, $3
+    add hl, de  ; skip to PrevX
 
     ld a, (hl)
     ld d, a     ; Save PrevX to D
-    inc hl      ; PrevY
+
+    inc hl      ; points to PrevY
 
     ld a, (hl)
     ld e, a     ; Save PrevY to E
 
-    push bc
     push hl
     call get_screen_address
     ; Video RAM address for those X,Y is now in HL and the bit needed
     ; to be set in that address value is in A
-    call clear_pixel    ; Uses those values clears the pixel
+    call clear_pixel    ; Uses those values and clears the pixel
     pop hl
 
-    ld bc, $4   ; Go back to X
-    sbc hl, bc
+    ld bc, $4
+    sbc hl, bc  ; Go back to X
 
-    pop bc
 ; WRITES THE PIXEL
-    ld a, (hl)  ; HL points to X
+    ld a, (hl)  ; HL should point to X
     ld d, a     ; Save X to D
-    inc hl      ; Y
+
+    inc hl      ; points to Y
 
     ld a, (hl)
     ld e, a     ; Save Y to E
 
-    push bc
     push hl
     call get_screen_address
     ; Video RAM address for those X,Y is now in HL and the bit needed
@@ -68,12 +68,12 @@ main
     call write_pixel    ; Uses those values and writes the pixel
     pop hl
 
-    ld bc, $4   ; Jump 4 positions - Next star
-    add hl, bc
+    ld bc, $4
+    add hl, bc  ; Skip 4 positions to the next star
 
-    pop bc
-
+    pop bc      ; Remove counter from stack
     dec c       ; Decrement counter
+
     jr nz, main ; Repeat if not zero
 
     call increment_x    ; Increment X position in each star
@@ -89,7 +89,7 @@ table
     db   82,97,120,111,102,116,20,12
 
 get_rnd
-    push bc ; Guarda o valor de RET na stack
+    push bc
 
 get_rnd_loop
     push de
@@ -149,54 +149,55 @@ get_rnd_loop
 
 get_rnd_ret
     ld a, h
-    pop bc  ; Tira o valor de RET da stack
+    and a   ; Reset carry
+    pop bc
     ret
 ENDP
 
 PROC
 ; Initialize stars X and Y with "random" values
-initStars
+init_stars
     push bc
-    ld d, MAX_STARS ; Number of stars to process
-    ld hl, STARS    ; HL points to X of first start
+    ld hl, STARS    ; HL points to X of first star
+    ld c, MAX_STARS ; Number of stars to process
 
-initStars_loop
-    push de
+init_stars_loop
+    push bc
 
     push hl
     ld d, 1
     ld e, 255
-    call get_rnd    ; Get a random value <= 255
+    call get_rnd    ; Get a random value between 1 and 255
     pop hl
 
-    ld (hl), a      ; Set X to random value
+    ld (hl), a      ; Set X value
 
     inc hl          ; points to Y
 
     push hl
     ld d, 1
     ld e, 191
-    call get_rnd
+    call get_rnd    ; Get a random value between 1 and 191
     pop hl
 
-    ld (hl), a      ; Set Y to random value
+    ld (hl), a      ; Set Y value
 
     inc hl          ; points to Speed
 
     push hl
     ld d, 1
     ld e, 10
-    call get_rnd    ; Get a random value <= 255
+    call get_rnd    ; Get a random value between 1 and 10
     pop hl
 
-    ld (hl), a      ; Set Speed to random value
+    ld (hl), a      ; Set Speed value
 
-    ld bc, $3       ; Jump to next star
-    add hl, bc      ; Skip PrevX and PrevY
+    ld bc, $3
+    add hl, bc      ; Skip 3 bytes to the next star
 
-    pop de    
-    dec d           ; Decrement counter
-    jr nz, initStars_loop   ; If not zero, do it again
+    pop bc
+    dec c           ; Decrement counter
+    jr nz, init_stars_loop  ; If not zero, do it again
 
     pop bc
     ret
@@ -208,6 +209,7 @@ increment_x
     push bc
     ld hl, STARS
     ld c, MAX_STARS
+
 increment_x_loop
 ; First lets copy current position to previous position
     ld d, (hl)  ; Save current X to D
@@ -221,15 +223,14 @@ increment_x_loop
     ld (hl), e  ; Save Y
     
     ld de, $4
-    sbc hl, de  ; Go back to X
+    sbc hl, de  ; Go back 4 bytes to X
 
     ld a, (hl)  ; Is X at $FF - end of screen
     cp $ff
-    jr z, increment_x_zero  ; Yes, lets reset
+    jr z, increment_x_zero  ; Yes, lets reset it
 
 ; Increments X position by speed value
-; X = X + Y
-
+; X = X + Speed
     inc hl      ; points to Y
     inc hl      ; points to Speed
 
@@ -245,8 +246,8 @@ increment_x_update
 ; Saves to X the value in A
     ld (hl), a  ; Save X with the value in A
 
-    ld de, $5   ; Skip 5 bytes to the next star
-    add hl, de
+    ld de, $5
+    add hl, de  ; Skip 5 bytes to the next star
 
     dec c       ; Decrement counter
     jr nz, increment_x_loop ; If not zero, do it again
@@ -265,7 +266,7 @@ increment_x_zero
     call get_rnd
     pop hl
 
-    ld (hl), a  ; Set Y = getRandomY
+    ld (hl), a  ; Set Y value
 
     inc hl      ; point to speed
 
@@ -275,9 +276,7 @@ increment_x_zero
     call get_rnd
     pop hl
 
-    ld (hl), a  ; Set Speed = getRandomSpeed
-
-    and a   ; Reset carry
+    ld (hl), a  ; Set Speed value
 
     ld de, $2
     sbc hl, de  ; Get back to X position
