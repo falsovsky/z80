@@ -22,7 +22,6 @@ start
     push bc
 
     call clear_screen   ; Clear the screen
-    call initRandom
     call initStars  ; Initialize the number of stars defined in MAX_STARS
 
 main_start
@@ -155,33 +154,6 @@ get_rnd_ret
 ENDP
 
 PROC
-initRandom
-    push bc
-
-; Speed
-    ld b, MAX_STARS*2
-    ld hl, speedranddata
-
-initRandomSpeed
-    push hl
-    push bc
-    ld d, 1
-    ld e, 10
-    call get_rnd    ; Get a random value <= 255
-    pop bc
-    pop hl
-    
-    ld (hl), a
-    inc hl
-
-    dec b
-    jr nz, initRandomSpeed
-
-    pop bc
-    ret
-ENDP
-
-PROC
 ; Initialize stars X and Y with "random" values
 initStars
     push bc
@@ -212,7 +184,9 @@ initStars_loop
     inc hl          ; points to Speed
 
     push hl
-    call getRandomSpeed ; Get a random value for Speed | 1 - 4
+    ld d, 1
+    ld e, 10
+    call get_rnd    ; Get a random value <= 255
     pop hl
 
     ld (hl), a      ; Set Speed to random value
@@ -226,26 +200,6 @@ initStars_loop
 
     pop bc
     ret
-ENDP
-
-PROC
-; Gets a value a from a list of pre-calculated values
-; Returns to begin after 0 is found | TODO: change this
-getRandomSpeed
-    push hl
-getRandomSpeed_loop    
-    ld hl, (speedrandpos)
-    ld a, (hl)
-    cp $0
-    jr z, getRandomSpeed_reset
-    inc hl
-    ld (speedrandpos), hl
-    pop hl
-    ret
-getRandomSpeed_reset
-    ld hl, speedranddata
-    ld (speedrandpos), hl
-    jr getRandomSpeed_loop
 ENDP
 
 PROC
@@ -316,10 +270,14 @@ increment_x_zero
     inc hl      ; point to speed
 
     push hl
-    call getRandomSpeed ; Get a random Speed value
+    ld d, 1
+    ld e, 10
+    call get_rnd
     pop hl
 
     ld (hl), a  ; Set Speed = getRandomSpeed
+
+    and a   ; Reset carry
 
     ld de, $2
     sbc hl, de  ; Get back to X position
@@ -419,13 +377,6 @@ ENDP
 STARS
     REPT MAX_STARS
         DB $0,$0, $0, $0,$0
-    ENDM
-
-speedrandpos    dw speedranddata
-
-speedranddata
-    REPT (MAX_STARS*2) + 1
-        db  $0
     ENDM
 
 END start
