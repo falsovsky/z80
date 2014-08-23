@@ -26,18 +26,18 @@ start
     push bc
 
     call clear_screen   ; Clear the screen
-    call init_stars  ; Initialize the number of stars defined in MAX_STARS
+    call init_stars  ; Initialize the stars data
 
 main_start
-    ld hl, STARS    ; points to X
-    ld c, MAX_STARS ; Set counter value
+    ld hl, STARS    ; points to X of the first star
+    ld c, MAX_STARS ; Counter - stars to process
 
 main
 ; CLEAR THE LAST POSITION
-    push bc     ; save MAX_STARS in the stack
+    push bc     ; save counter in the stack
 
     ld de, $3
-    add hl, de  ; skip to PrevX
+    add hl, de  ; skip 3 bytes to PrevX
 
     ld a, (hl)
     ld d, a     ; Save PrevX to D
@@ -88,65 +88,60 @@ main
     ret
 
 PROC
-; D = valor minimo
-; E = valor maximo
-table
-    db   82,97,120,111,102,116,20,12
-
+; D = minimum value
+; E = maximum value
 get_rnd
     push bc
 
 get_rnd_loop
     push de
-    ld de, 0     ; c,i
+    ld de, 0
     ld b, 0
     ld c, e
     ld hl, table
     add hl, bc
 
-    ld c, (hl)   ; y = q[i]
+    ld c, (hl)
 
     push hl
 
-    ld a, e      ; i = ( i + 1 ) & 7
+    ld a, e
     inc a
     and 7
     ld e, a
 
-    ld h, c      ; t = 256 * y
+    ld h, c
     ld l, b
 
-    sbc hl, bc    ; t = 255 * y
-    sbc hl, bc    ; t = 254 * y
-    sbc hl, bc    ; t = 253 * y
+    sbc hl, bc
+    sbc hl, bc
+    sbc hl, bc
 
     ld c, d
-    add hl, bc    ; t = 253 * y + c
+    add hl, bc
 
-    ld d, h      ; c = t / 256
+    ld d, h
 
     ld (get_rnd_loop+2), de
 
-    ld a,l      ; x = t % 256
-    cpl           ; x = (b-1) - x = -x - 1 = ~x + 1 - 1 = ~x
+    ld a,l
+    cpl
 
     pop hl
 
-    ld (hl), a   ; q[i] = x
+    ld (hl), a
     
     pop de
     
     ld h, a ; Save A to H
 
-    ld a, e ; Valor maximo em A
-    cp h
+    ld a, e ; Maximum value in A
+    cp h    ; Compare with random value
+    jr z, get_rnd_ret
+    jr c, get_rnd_loop
 
-    jr z, get_rnd_ret   ; É igual
-    jr c, get_rnd_loop ; Se for menor
-
-    ld a, d
-    cp h
-
+    ld a, d ; Minimum value in A
+    cp h    ; Compare with random value
     jr z, get_rnd_ret
     jr c, get_rnd_ret
 
@@ -157,6 +152,9 @@ get_rnd_ret
     and a   ; Reset carry
     pop bc
     ret
+    
+table
+    db   82,97,120,111,102,116,20,12
 ENDP
 
 PROC
@@ -164,7 +162,7 @@ PROC
 init_stars
     push bc
     ld hl, STARS    ; HL points to X of first star
-    ld c, MAX_STARS ; Number of stars to process
+    ld c, MAX_STARS ; Counter
 
 init_stars_loop
     push bc
@@ -213,7 +211,7 @@ PROC
 increment_x
     push bc
     ld hl, STARS
-    ld c, MAX_STARS
+    ld c, MAX_STARS ; Counter
 
 increment_x_loop
 ; First lets copy current position to previous position
@@ -266,7 +264,7 @@ increment_x_zero
     inc hl      ; point to Y
 
     push hl
-    ld d, 1
+    ld d, 0
     ld e, 191
     call get_rnd
     pop hl
@@ -299,6 +297,7 @@ write_pixel
     ld b, a
     ld c, $0
     scf
+
 write_pixel_loop
     ld a, c
     rra
@@ -307,6 +306,7 @@ write_pixel_loop
     jr z, write_pixel_do_it
     dec b
     jr write_pixel_loop
+
 write_pixel_do_it
     ld a, (hl)
     or c
@@ -323,6 +323,7 @@ clear_pixel
     ld b, a
     ld c, $ff
     and a   ; reset carry
+
 clear_pixel_loop
     ld a, c
     rra
@@ -331,6 +332,7 @@ clear_pixel_loop
     jr z, clear_pixel_do_it
     dec b
     jr clear_pixel_loop
+
 clear_pixel_do_it
     ld a, (hl)
     and c
