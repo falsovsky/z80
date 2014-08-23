@@ -7,13 +7,18 @@ last_k      EQU $5c08   ; Last pressed key
 
 ; Screen is 256x192
 
-; Star Structure
-; X         1 Byte
-; Y         1 Byte
-; Speed     1 Byte
-; PrevX     1 Byte
-; PrevY     1 Byte
 MAX_STARS   EQU 100
+
+; Star Structure
+STARS
+    REPT MAX_STARS
+        db $0   ; X
+        db $0   ; Y
+        db $0   ; Speed
+        db $0   ; Previous X
+        db $0   ; Previous Y
+    ENDM
+
 
 start
     xor a
@@ -155,7 +160,7 @@ get_rnd_ret
 ENDP
 
 PROC
-; Initialize stars X and Y with "random" values
+; Initialize stars X, Y and Speed with "random" values
 init_stars
     push bc
     ld hl, STARS    ; HL points to X of first star
@@ -165,9 +170,9 @@ init_stars_loop
     push bc
 
     push hl
-    ld d, 1
+    ld d, 0
     ld e, 255
-    call get_rnd    ; Get a random value between 1 and 255
+    call get_rnd    ; Get a random value between 0 and 255
     pop hl
 
     ld (hl), a      ; Set X value
@@ -175,9 +180,9 @@ init_stars_loop
     inc hl          ; points to Y
 
     push hl
-    ld d, 1
+    ld d, 0
     ld e, 191
-    call get_rnd    ; Get a random value between 1 and 191
+    call get_rnd    ; Get a random value between 0 and 191
     pop hl
 
     ld (hl), a      ; Set Y value
@@ -215,13 +220,13 @@ increment_x_loop
     ld d, (hl)  ; Save current X to D
     inc hl      ; points to Y
     ld e, (hl)  ; Save current Y to E
-    
+
     inc hl      ; points to Speed
     inc hl      ; points to PrevX
     ld (hl), d  ; Save X
     inc hl      ; PrevY
     ld (hl), e  ; Save Y
-    
+
     ld de, $4
     sbc hl, de  ; Go back 4 bytes to X
 
@@ -372,10 +377,5 @@ ENDP
 PROC
 INCLUDE "clear.asm"
 ENDP
-
-STARS
-    REPT MAX_STARS
-        DB $0,$0, $0, $0,$0
-    ENDM
 
 END start
