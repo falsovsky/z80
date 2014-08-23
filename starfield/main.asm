@@ -292,25 +292,27 @@ ENDP
 PROC
 ; Video Ram Address in HL
 ; Pixel to write in A
+; Creates a binary value to allow to set the correct bit at HL
 write_pixel
     push bc
-    ld b, a
-    ld c, $0
-    scf
+    ld b, a     ; Counter - value in A
+    ld c, $0    ; Start with all bits set to 0
+    scf         ; Set carry flag
 
 write_pixel_loop
-    ld a, c
-    rra
-    ld c, a
-    ld a, b
-    jr z, write_pixel_do_it
-    dec b
-    jr write_pixel_loop
+    ld a, c     ; A = C
+    rra         ; Rotate right with carry
+    ld c, a     ; C = A
+
+    ld a, b     ; A = B (counter)
+    jr z, write_pixel_do_it ; If B is zero, do it!
+    dec b       ; B = B - 1
+    jr write_pixel_loop ; Do it all over again
 
 write_pixel_do_it
-    ld a, (hl)
-    or c
-    ld (hl), a
+    ld a, (hl)  ; Read the value at HL
+    or c        ; OR it with the value in C (the bit to be set)
+    ld (hl), a  ; Save it back to HL
     pop bc
     ret
 ENDP
@@ -318,25 +320,27 @@ ENDP
 PROC
 ; Video Ram Address in HL
 ; Pixel to write in A
+; Creates a binary value to allow to unset the correct bit at HL
 clear_pixel
     push bc
-    ld b, a
-    ld c, $ff
-    and a   ; reset carry
+    ld b, a     ; Counter - value in A
+    ld c, $ff   ; Start with all bits set to 1
+    and a       ; Reset carry flag
 
 clear_pixel_loop
-    ld a, c
-    rra
-    ld c, a
-    ld a, b
-    jr z, clear_pixel_do_it
-    dec b
-    jr clear_pixel_loop
+    ld a, c     ; A = C
+    rra         ; Rotate right with carry
+    ld c, a     ; C = A
+
+    ld a, b     ; A = B (counter)
+    jr z, clear_pixel_do_it ; If B is zero, do it!
+    dec b       ; B = B - 1
+    jr clear_pixel_loop ; Do it all over again
 
 clear_pixel_do_it
-    ld a, (hl)
-    and c
-    ld (hl), a
+    ld a, (hl)  ; Read the value at HL
+    and c       ; AND it with the value in C (the bit to be unset)
+    ld (hl), a  ; Save it back to HL
     pop bc
     ret
 ENDP
