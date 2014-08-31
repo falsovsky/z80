@@ -1,3 +1,5 @@
 *.tap
 *.o
 *.exe
+zxscr/stderr.txt
+zxscr/stdout.txt

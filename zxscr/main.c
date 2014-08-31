@@ -112,8 +112,7 @@ main (int argc, char *argv[])
     }
     atexit (SDL_Quit);
 
-    /* Set 640x480 16-bits video mode */
-    screen = SDL_SetVideoMode (640, 480, 16, SDL_SWSURFACE | SDL_DOUBLEBUF);
+    screen = SDL_SetVideoMode (256, 192, 16, SDL_SWSURFACE | SDL_DOUBLEBUF);
     if (screen == NULL)
     {
         sprintf (msg, "Couldn't set 640x480x16 video mode: %s\n",
