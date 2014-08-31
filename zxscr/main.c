@@ -81,7 +81,7 @@ draw ()
                 if (READ_BIT(c,z)) {
                    rect.w = 1;
                    rect.h = 1;
-                   rect.x = (i*8-z)+8;
+                   rect.x = (i*8-z)+7;
                    rect.y = b;
                    SDL_FillRect (screen, &rect, color);
                 }
