@@ -9,9 +9,10 @@ last_k      EQU $5c08   ; Last pressed key
 
 MAX_STARS   EQU 100
 
-; Star Structure
+; "Allocate" memory for all the stars
 STARS
     REPT MAX_STARS
+        ; Star Structure
         db $0   ; X
         db $0   ; Y
         db $0   ; Speed
