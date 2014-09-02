@@ -57,9 +57,9 @@ proxima_letra_loop
     inc hl                  ; Anda para a frente
     ld a, (hl)              ; Le o proximo valor
     cp $0                   ; Se for 0 estamos no fim da string
-    jr z, proxima_letra_sem_reset ; Manda fazer reset à posição
+    jr z, proxima_letra_set_reset ; Manda fazer reset à posição
     jr proxima_letra_fim    ; Senão continua
-proxima_letra_sem_reset
+proxima_letra_set_reset
     ld a, $1                ; Manda meter a posicao a 0 na proxima
     ld (reset_posicao), a   ; iteração
 proxima_letra_fim
